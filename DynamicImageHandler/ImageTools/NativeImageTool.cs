@@ -84,11 +84,13 @@ namespace DynamicImageHandler.ImageTools
 			int destWidth = width ?? 1;
 			int destHeight = height ?? 1;
 
+			int newBitmapWidth = destWidth;
+			int newBitmapHeight = destHeight;
+
 			if (preservePerspective)
 			{
 				double maxWidth = width.HasValue ? Convert.ToDouble(width.Value) : 0;
 				double maxHeight = height.HasValue ? Convert.ToDouble(height.Value) : 0;
-
 
 				if (maxWidth > 0 && maxHeight <= 0)
 				{
@@ -126,21 +128,28 @@ namespace DynamicImageHandler.ImageTools
 					destY = Convert.ToInt32(Math.Floor(((maxHeight - doubleDestHeight) * .5)));
 				}
 
-				destWidth = keepSquare ? Convert.ToInt32(Math.Floor(maxWidth)) : Convert.ToInt32(Math.Floor(doubleDestWidth));
-				destHeight = keepSquare ? Convert.ToInt32(Math.Floor(maxHeight)) : Convert.ToInt32(Math.Floor(doubleDestHeight));
+				newBitmapWidth = destWidth = Math.Max(Convert.ToInt32(Math.Floor(doubleDestWidth)), 1);
+				newBitmapHeight = destHeight = Math.Max(Convert.ToInt32(Math.Floor(doubleDestHeight)), 1);
+
+				if (keepSquare)
+				{
+					newBitmapWidth = Math.Max(Convert.ToInt32(Math.Floor(maxWidth)), 1);
+					newBitmapHeight = Math.Max(Convert.ToInt32(Math.Floor(maxHeight)), 1);
+				}
+			}
+			else
+			{
+				newBitmapWidth = Math.Max(destWidth, 1);
+				newBitmapHeight = Math.Max(destHeight, 1);				
 			}
 
-			// make sure the height/width is at least 1x1
-			destHeight = Math.Max(destHeight, 1);
-			destWidth = Math.Max(destWidth, 1);
-
-			var bitmap = new Bitmap(destWidth, destHeight, PixelFormat.Format24bppRgb);
+			var bitmap = new Bitmap(newBitmapWidth, newBitmapHeight, PixelFormat.Format24bppRgb);
 
 			using (Graphics graphics = Graphics.FromImage(bitmap))
 			{
 				using (var backgroundBrush = new SolidBrush(bgColor))
 				{
-					graphics.FillRectangle(backgroundBrush, new Rectangle(0, 0, destWidth, destHeight));
+					graphics.FillRectangle(backgroundBrush, new Rectangle(0, 0, newBitmapWidth, newBitmapHeight));
 				}
 
 				graphics.CompositingMode = CompositingMode.SourceOver;
