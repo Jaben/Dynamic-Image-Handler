@@ -131,8 +131,8 @@ namespace DynamicImageHandler.ImageTools
 			}
 
 			// make sure the height/width is at least 1x1
-			destHeight = Math.Min(destHeight, 1);
-			destWidth = Math.Min(destWidth, 1);
+			destHeight = Math.Max(destHeight, 1);
+			destWidth = Math.Max(destWidth, 1);
 
 			var bitmap = new Bitmap(destWidth, destHeight, PixelFormat.Format24bppRgb);
 
