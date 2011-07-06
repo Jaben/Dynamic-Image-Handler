@@ -1,6 +1,21 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="HiddenImageParameters.cs" company="">
-//   
+// Copyright (c) 2009-2010 Esben Carlsen
+// Forked by Jaben Cargman
+//	
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
 // </copyright>
 // <summary>
 //   The hidden image parameters.
@@ -145,90 +160,6 @@ namespace DynamicImageHandler.ImageParameters
 					}
 				}
 			}
-		}
-
-		#endregion
-	}
-
-	/// <summary>
-	/// 	The crc 32.
-	/// </summary>
-	public class Crc32
-	{
-		#region Constants and Fields
-
-		/// <summary>
-		/// 	The table.
-		/// </summary>
-		private readonly uint[] table;
-
-		#endregion
-
-		#region Constructors and Destructors
-
-		/// <summary>
-		/// 	Initializes a new instance of the <see cref = "Crc32" /> class.
-		/// </summary>
-		public Crc32()
-		{
-			uint poly = 0xedb88320;
-			this.table = new uint[256];
-			uint temp = 0;
-			for (uint i = 0; i < this.table.Length; ++i)
-			{
-				temp = i;
-				for (int j = 8; j > 0; --j)
-				{
-					if ((temp & 1) == 1)
-					{
-						temp = (temp >> 1) ^ poly;
-					}
-					else
-					{
-						temp >>= 1;
-					}
-				}
-
-				this.table[i] = temp;
-			}
-		}
-
-		#endregion
-
-		#region Public Methods
-
-		/// <summary>
-		/// 	The compute checksum.
-		/// </summary>
-		/// <param name="bytes">
-		/// 	The bytes.
-		/// </param>
-		/// <returns>
-		/// 	The compute checksum.
-		/// </returns>
-		public uint ComputeChecksum(byte[] bytes)
-		{
-			uint crc = 0xffffffff;
-			for (int i = 0; i < bytes.Length; ++i)
-			{
-				var index = (byte)((crc & 0xff) ^ bytes[i]);
-				crc = (crc >> 8) ^ this.table[index];
-			}
-
-			return ~crc;
-		}
-
-		/// <summary>
-		/// 	The compute checksum bytes.
-		/// </summary>
-		/// <param name="bytes">
-		/// 	The bytes.
-		/// </param>
-		/// <returns>
-		/// </returns>
-		public byte[] ComputeChecksumBytes(byte[] bytes)
-		{
-			return BitConverter.GetBytes(this.ComputeChecksum(bytes));
 		}
 
 		#endregion

@@ -1,17 +1,55 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="FreeImageImageTool.cs" company="">
+// Copyright (c) 2009-2010 Esben Carlsen
+// Forked by Jaben Cargman
+//	
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
 
-using FreeImageAPI;
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 
-using DynamicImageHandler.ImageTools;
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+// </copyright>
+// <summary>
+//   The free image image tool.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace DynamicImageHandler.ImageTool.FreeImage
 {
+	using System.Drawing;
+	using System.Drawing.Imaging;
+	using System.IO;
+
+	using DynamicImageHandler.ImageTools;
+
+	using FreeImageAPI;
+
+	/// <summary>
+	/// The free image image tool.
+	/// </summary>
 	public class FreeImageImageTool : NativeImageTool
 	{
-		#region Instance Methods
+		#region Public Methods
 
+		/// <summary>
+		/// The encode.
+		/// </summary>
+		/// <param name="source">
+		/// The source.
+		/// </param>
+		/// <param name="imageFormat">
+		/// The image format.
+		/// </param>
+		/// <returns>
+		/// </returns>
 		public override byte[] Encode(Bitmap source, ImageFormat imageFormat)
 		{
 			FIBITMAP dib = FreeImageAPI.FreeImage.CreateFromBitmap(source);
@@ -23,12 +61,14 @@ namespace DynamicImageHandler.ImageTool.FreeImage
 
 			using (MemoryStream ms = new MemoryStream())
 			{
-				if (!FreeImageAPI.FreeImage.SaveToStream(
-					ref dib, ms,
-					ConvertToFreeImageFormat(imageFormat),
-					ConvertToFreeImageSaveFlags(imageFormat),
-					FREE_IMAGE_COLOR_DEPTH.FICD_AUTO,
-					true))
+				if (
+					!FreeImageAPI.FreeImage.SaveToStream(
+						ref dib, 
+						ms, 
+						ConvertToFreeImageFormat(imageFormat), 
+						ConvertToFreeImageSaveFlags(imageFormat), 
+						FREE_IMAGE_COLOR_DEPTH.FICD_AUTO, 
+						true))
 				{
 					return base.Encode(source, imageFormat);
 				}
@@ -39,8 +79,16 @@ namespace DynamicImageHandler.ImageTool.FreeImage
 
 		#endregion
 
-		#region Class Methods
+		#region Methods
 
+		/// <summary>
+		/// The convert to free image format.
+		/// </summary>
+		/// <param name="imageFormat">
+		/// The image format.
+		/// </param>
+		/// <returns>
+		/// </returns>
 		private static FREE_IMAGE_FORMAT ConvertToFreeImageFormat(ImageFormat imageFormat)
 		{
 			if (imageFormat == ImageFormat.Png)
@@ -66,6 +114,14 @@ namespace DynamicImageHandler.ImageTool.FreeImage
 			return FREE_IMAGE_FORMAT.FIF_PNG;
 		}
 
+		/// <summary>
+		/// The convert to free image save flags.
+		/// </summary>
+		/// <param name="imageFormat">
+		/// The image format.
+		/// </param>
+		/// <returns>
+		/// </returns>
 		private static FREE_IMAGE_SAVE_FLAGS ConvertToFreeImageSaveFlags(ImageFormat imageFormat)
 		{
 			if (imageFormat == ImageFormat.Png)
