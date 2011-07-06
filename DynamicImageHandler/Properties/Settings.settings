@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DynamicImageHandler.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ImageToolType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DynamicImageHandler.ImageTools.NativeImageTool, DynamicImageHandler</Value>
+    </Setting>
+    <Setting Name="ImageProviderType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DynamicImageHandler.ImageProviders.FileSystemImageProvider, DynamicImageHandler</Value>
+    </Setting>
+    <Setting Name="ImageStoreType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DynamicImageHandler.ImageStores.FileSystemImageStore, DynamicImageHandler</Value>
+    </Setting>
+    <Setting Name="FileSystemImageStorePath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">c:\temp</Value>
+    </Setting>
+    <Setting Name="ImageCacheTimeout" Type="System.TimeSpan" Scope="Application">
+      <Value Profile="(Default)">10:00:00</Value>
+    </Setting>
+    <Setting Name="ImageCleanRunInterval" Type="System.TimeSpan" Scope="Application">
+      <Value Profile="(Default)">01:00:00</Value>
+    </Setting>
+    <Setting Name="ImageParametersType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DynamicImageHandler.ImageParameters.SimpleImageParameters, DynamicImageHandler</Value>
+    </Setting>
+    <Setting Name="ImageParameterKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">PLEASE_CHANGE_ME_IMMEDIATELY!</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
