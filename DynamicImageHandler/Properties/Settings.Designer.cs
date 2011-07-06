@@ -52,7 +52,7 @@ namespace DynamicImageHandler.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c:\\temp")]
+        [global::System.Configuration.DefaultSettingValueAttribute("|AppData|")]
         public string FileSystemImageStorePath {
             get {
                 return ((string)(this["FileSystemImageStorePath"]));
@@ -70,7 +70,7 @@ namespace DynamicImageHandler.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("01:00:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("05:00:00")]
         public global::System.TimeSpan ImageCleanRunInterval {
             get {
                 return ((global::System.TimeSpan)(this["ImageCleanRunInterval"]));
