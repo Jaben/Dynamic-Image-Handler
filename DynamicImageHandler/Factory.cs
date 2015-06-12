@@ -35,9 +35,7 @@ namespace DynamicImageHandler
 	/// </summary>
 	public class Factory
 	{
-		#region Constants and Fields
-
-		/// <summary>
+	    /// <summary>
 		/// The s_ sync lock.
 		/// </summary>
 		private static readonly object s_SyncLock = new object();
@@ -57,11 +55,7 @@ namespace DynamicImageHandler
 		/// </summary>
 		private static IImageTool s_ImageTool;
 
-		#endregion
-
-		#region Public Methods
-
-		/// <summary>
+	    /// <summary>
 		/// 	Creates an unique instance of the image parameter class...
 		/// </summary>
 		/// <returns>
@@ -167,7 +161,5 @@ namespace DynamicImageHandler
 
 			return s_ImageTool;
 		}
-
-		#endregion
 	}
 }

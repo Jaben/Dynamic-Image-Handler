@@ -1,152 +1,129 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FreeImageImageTool.cs" company="">
-// Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
-//	
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+﻿// DynamicImageHandler.ImageTool.FreeImage - Copyright (c) 2015 CaptiveAire
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-// </copyright>
-// <summary>
-//   The free image image tool.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+using DynamicImageHandler.ImageTools;
+
+using FreeImageAPI;
 
 namespace DynamicImageHandler.ImageTool.FreeImage
 {
-	using System.Drawing;
-	using System.Drawing.Imaging;
-	using System.IO;
+    /// <summary>
+    /// The free image image tool.
+    /// </summary>
+    public class FreeImageImageTool : NativeImageTool
+    {
+        #region Public Methods
 
-	using DynamicImageHandler.ImageTools;
+        /// <summary>
+        /// The encode.
+        /// </summary>
+        /// <param name="source">
+        /// The source.
+        /// </param>
+        /// <param name="imageFormat">
+        /// The image format.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public override byte[] Encode(Bitmap source, ImageFormat imageFormat)
+        {
+            FIBITMAP dib = FreeImageAPI.FreeImage.CreateFromBitmap(source);
 
-	using FreeImageAPI;
+            if (dib.IsNull)
+            {
+                return base.Encode(source, imageFormat);
+            }
 
-	/// <summary>
-	/// The free image image tool.
-	/// </summary>
-	public class FreeImageImageTool : NativeImageTool
-	{
-		#region Public Methods
+            using (MemoryStream ms = new MemoryStream())
+            {
+                if (!FreeImageAPI.FreeImage.SaveToStream(
+                        ref dib,
+                        ms,
+                        ConvertToFreeImageFormat(imageFormat),
+                        ConvertToFreeImageSaveFlags(imageFormat),
+                        FREE_IMAGE_COLOR_DEPTH.FICD_AUTO,
+                        true))
+                {
+                    return base.Encode(source, imageFormat);
+                }
 
-		/// <summary>
-		/// The encode.
-		/// </summary>
-		/// <param name="source">
-		/// The source.
-		/// </param>
-		/// <param name="imageFormat">
-		/// The image format.
-		/// </param>
-		/// <returns>
-		/// </returns>
-		public override byte[] Encode(Bitmap source, ImageFormat imageFormat)
-		{
-			FIBITMAP dib = FreeImageAPI.FreeImage.CreateFromBitmap(source);
+                return ms.ToArray();
+            }
+        }
 
-			if (dib.IsNull)
-			{
-				return base.Encode(source, imageFormat);
-			}
+        #endregion
 
-			using (MemoryStream ms = new MemoryStream())
-			{
-				if (
-					!FreeImageAPI.FreeImage.SaveToStream(
-						ref dib, 
-						ms, 
-						ConvertToFreeImageFormat(imageFormat), 
-						ConvertToFreeImageSaveFlags(imageFormat), 
-						FREE_IMAGE_COLOR_DEPTH.FICD_AUTO, 
-						true))
-				{
-					return base.Encode(source, imageFormat);
-				}
+        #region Methods
 
-				return ms.ToArray();
-			}
-		}
+        /// <summary>
+        /// The convert to free image format.
+        /// </summary>
+        /// <param name="imageFormat">
+        /// The image format.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        private static FREE_IMAGE_FORMAT ConvertToFreeImageFormat(ImageFormat imageFormat)
+        {
+            if (imageFormat == ImageFormat.Png)
+            {
+                return FREE_IMAGE_FORMAT.FIF_PNG;
+            }
 
-		#endregion
+            if (imageFormat == ImageFormat.Gif)
+            {
+                return FREE_IMAGE_FORMAT.FIF_GIF;
+            }
 
-		#region Methods
+            if (imageFormat == ImageFormat.Jpeg)
+            {
+                return FREE_IMAGE_FORMAT.FIF_JPEG;
+            }
 
-		/// <summary>
-		/// The convert to free image format.
-		/// </summary>
-		/// <param name="imageFormat">
-		/// The image format.
-		/// </param>
-		/// <returns>
-		/// </returns>
-		private static FREE_IMAGE_FORMAT ConvertToFreeImageFormat(ImageFormat imageFormat)
-		{
-			if (imageFormat == ImageFormat.Png)
-			{
-				return FREE_IMAGE_FORMAT.FIF_PNG;
-			}
+            if (imageFormat == ImageFormat.Tiff)
+            {
+                return FREE_IMAGE_FORMAT.FIF_TIFF;
+            }
 
-			if (imageFormat == ImageFormat.Gif)
-			{
-				return FREE_IMAGE_FORMAT.FIF_GIF;
-			}
+            return FREE_IMAGE_FORMAT.FIF_PNG;
+        }
 
-			if (imageFormat == ImageFormat.Jpeg)
-			{
-				return FREE_IMAGE_FORMAT.FIF_JPEG;
-			}
+        /// <summary>
+        /// The convert to free image save flags.
+        /// </summary>
+        /// <param name="imageFormat">
+        /// The image format.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        private static FREE_IMAGE_SAVE_FLAGS ConvertToFreeImageSaveFlags(ImageFormat imageFormat)
+        {
+            if (imageFormat == ImageFormat.Png)
+            {
+                return FREE_IMAGE_SAVE_FLAGS.PNG_Z_BEST_COMPRESSION;
+            }
 
-			if (imageFormat == ImageFormat.Tiff)
-			{
-				return FREE_IMAGE_FORMAT.FIF_TIFF;
-			}
+            if (imageFormat == ImageFormat.Gif)
+            {
+                return FREE_IMAGE_SAVE_FLAGS.DEFAULT;
+            }
 
-			return FREE_IMAGE_FORMAT.FIF_PNG;
-		}
+            if (imageFormat == ImageFormat.Jpeg)
+            {
+                return FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD;
+            }
 
-		/// <summary>
-		/// The convert to free image save flags.
-		/// </summary>
-		/// <param name="imageFormat">
-		/// The image format.
-		/// </param>
-		/// <returns>
-		/// </returns>
-		private static FREE_IMAGE_SAVE_FLAGS ConvertToFreeImageSaveFlags(ImageFormat imageFormat)
-		{
-			if (imageFormat == ImageFormat.Png)
-			{
-				return FREE_IMAGE_SAVE_FLAGS.PNG_Z_BEST_COMPRESSION;
-			}
+            if (imageFormat == ImageFormat.Tiff)
+            {
+                return FREE_IMAGE_SAVE_FLAGS.TIFF_LZW;
+            }
 
-			if (imageFormat == ImageFormat.Gif)
-			{
-				return FREE_IMAGE_SAVE_FLAGS.DEFAULT;
-			}
+            return FREE_IMAGE_SAVE_FLAGS.PNG_Z_BEST_COMPRESSION;
+        }
 
-			if (imageFormat == ImageFormat.Jpeg)
-			{
-				return FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD;
-			}
-
-			if (imageFormat == ImageFormat.Tiff)
-			{
-				return FREE_IMAGE_SAVE_FLAGS.TIFF_LZW;
-			}
-
-			return FREE_IMAGE_SAVE_FLAGS.PNG_Z_BEST_COMPRESSION;
-		}
-
-		#endregion
-	}
+        #endregion
+    }
 }

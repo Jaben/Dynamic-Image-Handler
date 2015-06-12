@@ -28,6 +28,10 @@
     </UpgradeBackupLocation>
     <TargetFrameworkProfile />
     <UseIISExpress>false</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -87,9 +91,9 @@
     <Folder Include="App_GlobalResources\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DynamicImageHandler.ImageTool.FreeImage\DynamicImageHandler.ImageTool.FreeImage.csproj">
-      <Project>{144E0629-E10B-4189-A490-502F160FEA84}</Project>
-      <Name>DynamicImageHandler.ImageTool.FreeImage</Name>
+    <ProjectReference Include="..\DynamicImageHandler.ImageTool.Wpf\DynamicImageHandler.ImageTool.Wpf.csproj">
+      <Project>{04455087-221a-4f49-ac81-f0fc1f46aba0}</Project>
+      <Name>DynamicImageHandler.ImageTool.Wpf</Name>
     </ProjectReference>
     <ProjectReference Include="..\DynamicImageHandler\DynamicImageHandler.csproj">
       <Project>{EB46873F-DFB7-48EC-97EE-1A3BDF628B5B}</Project>

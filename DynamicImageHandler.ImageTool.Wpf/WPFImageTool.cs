@@ -24,9 +24,7 @@
 
 namespace DynamicImageHandler.ImageTool.Wpf
 {
-	#region Using
-
-	using System;
+    using System;
 	using System.Drawing;
 	using System.Drawing.Imaging;
 	using System.IO;
@@ -36,16 +34,12 @@ namespace DynamicImageHandler.ImageTool.Wpf
 
 	using DynamicImageHandler.ImageTools;
 
-	#endregion
-
-	/// <summary>
+    /// <summary>
 	/// 	The wpf image tool.
 	/// </summary>
 	public class WpfImageTool : NativeImageTool
 	{
-		#region Public Methods
-
-		/// <summary>
+        /// <summary>
 		/// 	The encode.
 		/// </summary>
 		/// <param name="source">
@@ -81,11 +75,7 @@ namespace DynamicImageHandler.ImageTool.Wpf
 			return base.Encode(source, imageFormat);
 		}
 
-		#endregion
-
-		#region Methods
-
-		/// <summary>
+        /// <summary>
 		/// 	The encode bitmap.
 		/// </summary>
 		/// <param name="bitmapEncoder">
@@ -108,7 +98,5 @@ namespace DynamicImageHandler.ImageTool.Wpf
 				return ms.ToArray();
 			}
 		}
-
-		#endregion
 	}
 }
