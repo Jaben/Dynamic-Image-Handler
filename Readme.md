@@ -11,5 +11,5 @@ GPLv2 licensed
 
 ## Have a real site? Use a real image resizer.
 
-If you have a real site and need a professional image resizing solution such as [ImageResizer.NET](http://imageresizing.net/).
+If you have a real site, you'll need a professional image resizing solution such as [ImageResizer.NET](http://imageresizing.net/).
 
