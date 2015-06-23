@@ -223,25 +223,43 @@ namespace DynamicImageHandler
                 return null;
             }
 
-            using (var sourceImageData = new MemoryStream(data))
+            Bitmap outputImg = null;
+
+            try
             {
-                var outputImg = (Bitmap)Image.FromStream(sourceImageData);
-                foreach (IImageFilter imageFilter in this._imageFilters)
+                using (var sourceImageData = new MemoryStream(data)) outputImg = (Bitmap)Image.FromStream(sourceImageData);
+
+                foreach (var imageFilter in this.ImageFilters.OrderBy(s => s.Order))
                 {
                     Bitmap oldOutputImage = outputImg;
-
                     bool modified = imageFilter.Process(parameters, context, ref outputImg);
                     if (modified)
                     {
                         // Dispose old bitmap
-                        oldOutputImage.Dispose();
+                        try
+                        {
+                            oldOutputImage.Dispose();
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                        }
                     }
                 }
 
-                using (outputImg)
+                // Encode image
+                return _imageTool.Encode(outputImg, imageFormat);
+            }
+            finally
+            {
+                if (outputImg != null)
                 {
-                    // Encode image
-                    return _imageTool.Encode(outputImg, imageFormat);
+                    try
+                    {
+                        outputImg.Dispose();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                    }
                 }
             }
         }
