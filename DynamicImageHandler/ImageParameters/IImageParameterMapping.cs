@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // Copyright (c) 2009-2010 Esben Carlsen
 // Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
 //	
@@ -17,21 +17,10 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Web;
-
 namespace DynamicImageHandler.ImageParameters
 {
-    public interface IImageParameters
+    public interface IImageParameterMapping
     {
-        string this[string parameter] { get; }
-
-        string ImageSrc { get; }
-
-        string Key { get; }
-
-        IDictionary<string, string> Parameters { get; }
-
-        void AddCollection(HttpContext context);
+        bool IsValid();
     }
 }

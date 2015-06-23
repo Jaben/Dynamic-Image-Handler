@@ -1,7 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HiddenImageParameters.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman and CaptiveAire Systems
+// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,14 +15,10 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
-// </copyright>
-// <summary>
-//   The hidden image parameters.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Web;
 
 using DynamicImageHandler.Properties;
@@ -33,16 +28,19 @@ namespace DynamicImageHandler.ImageParameters
 {
     public class HiddenImageParameters : SimpleImageParameters
     {
-        private static ISymCryptKey _currentKey;
+        private static readonly Lazy<ISymCryptKey> _currentKey =
+            new Lazy<ISymCryptKey>(() => new SymCryptKey(Settings.Default.ImageParameterKey));
 
+        /// <exception cref="MemberAccessException" accessor="get">The <see cref="T:System.Lazy`1" /> instance is initialized to use the default constructor of the type that is being lazily initialized, and permissions to access the constructor are missing.</exception>
         protected static ISymCryptKey CurrentCryptKey
         {
             get
             {
-                return _currentKey ?? (_currentKey = new SymCryptKey(Settings.Default.ImageParameterKey));
+                return _currentKey.Value;
             }
         }
 
+        /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
         public static string GetImageClassUrl(string parameters)
         {
             var paramClass = new HiddenImageParameters();
@@ -56,28 +54,27 @@ namespace DynamicImageHandler.ImageParameters
             return string.Format("id={0}", HttpUtility.UrlEncode(encodedParams));
         }
 
+        /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
         public override void AddCollection(HttpContext context)
         {
-            try
+            // process the hidden class into a string...
+            string classData = context.Request.QueryString["id"];
+
+            if (string.IsNullOrEmpty(classData))
             {
-                // process the hidden class into a string...
-                if (!string.IsNullOrEmpty(context.Request.QueryString["id"]))
-                {
-                    string classData = context.Request.QueryString["id"];
-                    this.LoadEncodedParameterString(classData);
-                }
+                return;
             }
-            catch (Exception x)
-            {
-                Trace.WriteLine("Exception: " + x.Message);
-            }
+
+            this.LoadEncodedParameterString(classData);
         }
 
+        /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
         public virtual string CreateEncodedParameterString()
         {
             return SymCrypt.Encrypt(this.ParametersAsString(), CurrentCryptKey);
         }
 
+        /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
         public virtual void LoadEncodedParameterString(string paramString)
         {
             string decrypted = SymCrypt.Decrypt(paramString, CurrentCryptKey);

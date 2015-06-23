@@ -1,7 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SymCrypt.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman and CaptiveAire Systems
+// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -15,11 +14,7 @@
 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-// </copyright>
-// <summary>
-//   The sym crypt.
-// </summary>
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
@@ -29,40 +24,21 @@ using System.Text;
 
 namespace DynamicImageHandler.Utils
 {
-    /// <summary>
-    ///     The sym crypt.
-    /// </summary>
     public class SymCrypt
     {
-        #region Public Methods
-
-        /// <summary>
-        ///     The bytes to hex string.
-        /// </summary>
-        /// <param name="bytes">
-        ///     The bytes.
-        /// </param>
-        /// <returns>
-        ///     The bytes to hex string.
-        /// </returns>
         public static string BytesToHexString(byte[] bytes)
         {
             var hexString = new StringBuilder();
 
             foreach (byte t in bytes)
             {
-                hexString.Append(string.Format("{0:X2}", t));
+                hexString.AppendFormat("{0:X2}", t);
             }
 
             return hexString.ToString();
         }
 
-        /// <summary>
-        ///     The create key.
-        /// </summary>
-        /// <returns>
-        ///     The create key.
-        /// </returns>
+        /// <exception cref="CryptographicException">The <see cref="T:System.Security.Cryptography.TripleDES" /> cryptographic service provider is not available. </exception>
         public static string CreateKey()
         {
             using (var provider = new TripleDESCryptoServiceProvider())
@@ -72,23 +48,23 @@ namespace DynamicImageHandler.Utils
             }
         }
 
-        /// <summary>
-        ///     The decrypt.
-        /// </summary>
-        /// <param name="InputText">
-        ///     The input text.
-        /// </param>
-        /// <param name="cryptKey">
-        ///     The crypt Key.
-        /// </param>
-        /// <returns>
-        ///     The decrypt.
-        /// </returns>
-        public static string Decrypt(string InputText, ISymCryptKey cryptKey)
+        /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="s" /> is null. </exception>
+        /// <exception cref="FormatException">The length of <paramref name="s" />, ignoring white-space characters, is not zero or a multiple of 4. -or-The format of <paramref name="s" /> is invalid. <paramref name="s" /> contains a non-base-64 character, more than two padding characters, or a non-white space-character among the padding characters.</exception>
+        public static string Decrypt(string inputText, ISymCryptKey cryptKey)
         {
+            if (inputText == null)
+            {
+                throw new ArgumentNullException("inputText");
+            }
+            if (cryptKey == null)
+            {
+                throw new ArgumentNullException("cryptKey");
+            }
+
             using (var rijndaelCipher = new RijndaelManaged())
             {
-                var encryptedData = Convert.FromBase64String(InputText);
+                var encryptedData = Convert.FromBase64String(inputText);
 
                 using (ICryptoTransform decryptor = rijndaelCipher.CreateDecryptor(cryptKey.Key, cryptKey.Salt))
                 using (var memoryStream = new MemoryStream(encryptedData))
@@ -101,20 +77,18 @@ namespace DynamicImageHandler.Utils
             }
         }
 
-        /// <summary>
-        ///     The encrypt.
-        /// </summary>
-        /// <param name="inputText">
-        ///     The input text.
-        /// </param>
-        /// <param name="cryptKey">
-        ///     The crypt Key.
-        /// </param>
-        /// <returns>
-        ///     The encrypt.
-        /// </returns>
+        /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
         public static string Encrypt(string inputText, ISymCryptKey cryptKey)
         {
+            if (inputText == null)
+            {
+                throw new ArgumentNullException("inputText");
+            }
+            if (cryptKey == null)
+            {
+                throw new ArgumentNullException("cryptKey");
+            }
+
             using (var rijndaelCipher = new RijndaelManaged())
             {
                 var plainText = Encoding.Unicode.GetBytes(inputText);
@@ -131,7 +105,5 @@ namespace DynamicImageHandler.Utils
                 }
             }
         }
-
-        #endregion
     }
 }
