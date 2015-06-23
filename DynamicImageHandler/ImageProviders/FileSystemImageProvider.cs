@@ -32,17 +32,17 @@ namespace DynamicImageHandler.ImageProviders
 
         private string GetMappedFileFromParams(IImageParameters parameters)
         {
-            if (string.IsNullOrEmpty(parameters.ImageSrc))
+            if (string.IsNullOrEmpty(parameters.GetImageSrc()))
             {
                 return null;
             }
 
-            if (FileSystemHelpers.FileExists(parameters.ImageSrc))
+            if (FileSystemHelpers.FileExists(parameters.GetImageSrc()))
             {
-                return parameters.ImageSrc;
+                return parameters.GetImageSrc();
             }
 
-            string filePath = HostingEnvironment.MapPath(parameters.ImageSrc);
+            string filePath = HostingEnvironment.MapPath(parameters.GetImageSrc());
 
             return FileSystemHelpers.FileExists(filePath) ? filePath : null;
         }

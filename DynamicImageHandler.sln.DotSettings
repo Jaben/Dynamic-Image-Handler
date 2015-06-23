@@ -16,4 +16,9 @@
 // You should have received a copy of the GNU Lesser General Public&#xD;
 // License along with this library; if not, write to the Free Software&#xD;
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA &#xD;
-// --------------------------------------------------------------------------------------------------------------------</s:String></wpf:ResourceDictionary>
+// --------------------------------------------------------------------------------------------------------------------</s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=21027477CB9D184689FEDF8DEB0192E7/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=21027477CB9D184689FEDF8DEB0192E7/AbsolutePath/@EntryValue">C:\Projects\Components\Dynamic-Image-Handler\DynamicImageHandler.sln.DotSettings</s:String>
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=21027477CB9D184689FEDF8DEB0192E7/RelativePath/@EntryValue"></s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File21027477CB9D184689FEDF8DEB0192E7/@KeyIndexDefined">True</s:Boolean>
+	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=File21027477CB9D184689FEDF8DEB0192E7/RelativePriority/@EntryValue">1</s:Double></wpf:ResourceDictionary>

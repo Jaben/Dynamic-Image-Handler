@@ -18,20 +18,15 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Web;
 
 namespace DynamicImageHandler.ImageParameters
 {
     public interface IImageParameters
     {
-        string this[string parameter] { get; }
-
-        string ImageSrc { get; }
-
         string Key { get; }
 
         IDictionary<string, string> Parameters { get; }
 
-        void AddCollection(HttpContext context);
+        void AppendRawParameters(IEnumerable<KeyValuePair<string,string>> rawParams);
     }
 }

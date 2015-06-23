@@ -74,12 +74,13 @@
             </div>
 
             <div class="well page">
-                <h2 class="header">Force Square Resize</h2>
+                <h2 class="header">Force Square Resize (JPEG to PNG Conversion)</h2>
                 <hr />
                 
-                <img src="ImageHandler.ashx?src=/App_Data/Frangipani Flowers.jpg&width=400&height=400&resize_square=true" />
-                <img src="ImageHandler.ashx?src=/App_Data/Frangipani Flowers.jpg&width=250&height=250&resize_square=true" />
-                <img src="ImageHandler.ashx?src=/App_Data/Frangipani Flowers.jpg&width=50&height=50&resize_square=true" />
+                <img src="ImageHandler.ashx?src=/App_Data/Frangipani Flowers.jpg&format=png&width=400&height=400&resize_square=true" />
+                <img src="ImageHandler.ashx?src=/App_Data/Frangipani Flowers.jpg&format=png&width=250&height=250&resize_square=true" />
+                <img src="ImageHandler.ashx?src=/App_Data/Frangipani Flowers.jpg&format=png&width=250&height=250&resize_square=true&resize_bgcolor=transparent" />
+                <img src="ImageHandler.ashx?src=/App_Data/Frangipani Flowers.jpg&format=png&width=50&height=50&resize_square=true" />
             </div>
 
             <div class="well page">

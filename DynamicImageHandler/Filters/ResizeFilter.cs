@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
 using System.Drawing;
 using System.Web;
 
@@ -65,7 +66,7 @@ namespace DynamicImageHandler.Filters
         [ParameterNames("resize_square", "resize_force_square")]
         public bool ForceSquare { get; set; }
 
-        [ParameterNames("resize_bgcolor", "resize_background")]
+        [ParameterNames("resize_bgcolor")]
         public string BackgroundColor { get; set; }
 
         public bool IsValid()

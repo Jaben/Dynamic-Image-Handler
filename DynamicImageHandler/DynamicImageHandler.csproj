@@ -101,6 +101,7 @@
     <Compile Include="ImageHandler.cs" />
     <Compile Include="ImageParameters\HiddenImageParameters.cs" />
     <Compile Include="ImageParameters\SimpleImageParameters.cs" />
+    <Compile Include="Utils\CollectionExtensions.cs" />
     <Compile Include="Utils\ISymCryptKey.cs" />
     <Compile Include="Utils\SymCrypt.cs" />
     <Compile Include="Utils\SymCryptKey.cs" />

@@ -31,6 +31,7 @@ using DynamicImageHandler.ImageParameters;
 using DynamicImageHandler.ImageProviders;
 using DynamicImageHandler.ImageStores;
 using DynamicImageHandler.ImageTools;
+using DynamicImageHandler.Utils;
 
 namespace DynamicImageHandler
 {
@@ -85,9 +86,9 @@ namespace DynamicImageHandler
             }
 
             // add query string to the parameters...
-            parameters.AddCollection(context);
+            parameters.AppendRawParameters(context.Request.QueryString.ToKeyValuePairs());
 
-            if (string.IsNullOrEmpty(parameters.ImageSrc))
+            if (string.IsNullOrEmpty(parameters.GetImageSrc()))
             {
                 // parameters aren't assigned...
                 return;
@@ -105,7 +106,7 @@ namespace DynamicImageHandler
                 return;
             }
 
-            ImageFormat imageFormat = GetImageFormat(parameters);
+            ImageFormat imageFormat = parameters.GetImageFormat();
 
             var imageData = _imageStore.GetImageData(key);
             if (imageData == null)
@@ -119,11 +120,13 @@ namespace DynamicImageHandler
                 _imageStore.PutImageData(key, imageData);
             }
 
-            context.Response.Cache.SetCacheability(HttpCacheability.Public);
-            context.Response.Cache.SetETag(eTag);
-            context.Response.Cache.SetExpires(DateTime.Now.AddYears(1));
-            context.Response.ContentType = "image/" + imageFormat.ToString().ToLower();
-            context.Response.OutputStream.Write(imageData, 0, imageData.Length);
+            var httpResponse = context.Response;
+
+            httpResponse.Cache.SetCacheability(HttpCacheability.Public);
+            httpResponse.Cache.SetETag(eTag);
+            httpResponse.Cache.SetExpires(DateTime.Now.AddYears(1));
+            httpResponse.ContentType = "image/" + imageFormat.ToString().ToLower();
+            httpResponse.OutputStream.Write(imageData, 0, imageData.Length);
         }
 
         /// <summary>
@@ -192,42 +195,7 @@ namespace DynamicImageHandler
             return true;
         }
 
-        /// <summary>
-        ///     The get image format.
-        /// </summary>
-        /// <param name="parameters">
-        ///     The parameters.
-        /// </param>
-        /// <returns>
-        /// </returns>
-        private static ImageFormat GetImageFormat(IImageParameters parameters)
-        {
-            if (!parameters.Parameters.ContainsKey("format"))
-            {
-                return ImageFormat.Jpeg;
-            }
-
-            string imageTypeParameter = parameters.Parameters["format"];
-
-            if (string.IsNullOrEmpty(imageTypeParameter))
-            {
-                return ImageFormat.Jpeg;
-            }
-
-            switch (imageTypeParameter.ToLowerInvariant())
-            {
-                case "png":
-                    return ImageFormat.Png;
-                case "gif":
-                    return ImageFormat.Gif;
-                case "jpg":
-                    return ImageFormat.Jpeg;
-                case "tif":
-                    return ImageFormat.Tiff;
-            }
-
-            return ImageFormat.Jpeg;
-        }
+        
 
         /// <summary>
         ///     Takes care of resizing image from url parameters

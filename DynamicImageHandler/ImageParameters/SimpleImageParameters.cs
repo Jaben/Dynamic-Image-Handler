@@ -17,11 +17,11 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
 
 using DynamicImageHandler.Utils;
 
@@ -29,43 +29,7 @@ namespace DynamicImageHandler.ImageParameters
 {
     public class SimpleImageParameters : IImageParameters
     {
-        private readonly SortedDictionary<string, string> _parameters = new SortedDictionary<string, string>();
-
-        public virtual string this[string parameter]
-        {
-            get
-            {
-                return this.Parameters.ContainsKey(parameter) ? this.Parameters[parameter] : null;
-            }
-        }
-
-        public virtual void AddCollection(HttpContext context)
-        {
-            foreach (string key in context.Request.QueryString.Keys)
-            {
-                if (this.Parameters.ContainsKey(key))
-                {
-                    this.Parameters[key] = context.Request.QueryString[key];
-                }
-                else if (!string.IsNullOrEmpty(context.Request.QueryString[key]))
-                {
-                    this.Parameters.Add(key, context.Request.QueryString[key]);
-                }
-            }
-        }
-
-        public virtual string ImageSrc
-        {
-            get
-            {
-                if (this.Parameters.ContainsKey("src"))
-                {
-                    return this.Parameters["src"];
-                }
-
-                return string.Empty;
-            }
-        }
+        private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
 
         public virtual string Key
         {
@@ -81,6 +45,16 @@ namespace DynamicImageHandler.ImageParameters
             {
                 return this._parameters;
             }
+        }
+
+        public virtual void AppendRawParameters(IEnumerable<KeyValuePair<string,string>> values)
+        {
+            if (values == null)
+            {
+                throw new ArgumentNullException("values");
+            }
+
+            this.Parameters.AddRange(values);
         }
 
         protected string MD5HashString(string value, int maxLength)

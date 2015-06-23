@@ -1,32 +1,93 @@
-// --------------------------------------------------------------------------------------------------------------------
-// Copyright (c) 2009-2010 Esben Carlsen
-// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
-//	
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
-// --------------------------------------------------------------------------------------------------------------------
+// // --------------------------------------------------------------------------------------------------------------------
+// // Copyright (c) 2009-2010 Esben Carlsen
+// // Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
+// // 
+// // This library is free software; you can redistribute it and/or
+// // modify it under the terms of the GNU Lesser General Public
+// // License as published by the Free Software Foundation; either
+// // version 2.1 of the License, or (at your option) any later version.
+// 
+// // This library is distributed in the hope that it will be useful,
+// // but WITHOUT ANY WARRANTY; without even the implied warranty of
+// // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// // Lesser General Public License for more details.
+// 
+// // You should have received a copy of the GNU Lesser General Public
+// // License along with this library; if not, write to the Free Software
+// // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
+// // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 
 namespace DynamicImageHandler.ImageParameters
 {
     public static class ImageParameterExtensions
     {
+        public static IDictionary<string, ImageFormat> ImageFormatLookup = new Dictionary<string, ImageFormat>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                { "png", ImageFormat.Png },
+                { "gif", ImageFormat.Gif },
+                { "jpg", ImageFormat.Jpeg },
+                { "tif", ImageFormat.Tiff }
+            };
+
+        public static ImageFormat GetImageFormat(this IImageParameters parameters)
+        {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException("parameters");
+            }
+
+            string format = parameters.GetValueOrEmpty("format");
+
+            if (!string.IsNullOrWhiteSpace(format))
+            {
+                ImageFormat imageFormat;
+                if (ImageFormatLookup.TryGetValue(format, out imageFormat))
+                {
+                    return imageFormat;
+                }
+            }
+
+            // default is JPEG
+            return ImageFormat.Jpeg;
+        }
+
+        public static string GetValueOrEmpty(this IImageParameters imageParameters, string name)
+        {
+            if (imageParameters == null)
+            {
+                throw new ArgumentNullException("imageParameters");
+            }
+
+            string value;
+            imageParameters.Parameters.TryGetValue(name, out value);
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                value = string.Empty;
+            }
+
+            return value;
+        }
+
+        public static string GetImageSrc(this IImageParameters imageParameters)
+        {
+            if (imageParameters == null)
+            {
+                throw new ArgumentNullException("imageParameters");
+            }
+
+            return imageParameters.GetValueOrEmpty("src");
+        }
+
         /// <exception cref="TargetInvocationException">An error occurred while setting the property value. For example, an index value specified for an indexed property is out of range. The <see cref="P:System.Exception.InnerException" /> property indicates the reason for the error.</exception>
         /// <exception cref="MethodAccessException">There was an illegal attempt to access a private or protected method inside a class. </exception>
         /// <exception cref="TargetParameterCountException">The number of parameters in <paramref name="index" /> does not match the number of parameters the indexed property takes. </exception>
@@ -44,7 +105,8 @@ namespace DynamicImageHandler.ImageParameters
 
             var mappedParamObj = new T();
             var properties =
-                mappedParamObj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
+                mappedParamObj.GetType()
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
 
             foreach (var p in properties)
             {

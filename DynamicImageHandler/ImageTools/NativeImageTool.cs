@@ -136,11 +136,19 @@ namespace DynamicImageHandler.ImageTools
                 newBitmapHeight = Math.Max(destHeight, 1);
             }
 
-            var bitmap = new Bitmap(newBitmapWidth, newBitmapHeight, PixelFormat.Format24bppRgb);
+            var bitmap = new Bitmap(newBitmapWidth, newBitmapHeight, PixelFormat.Format32bppArgb);
 
             using (Graphics graphics = Graphics.FromImage(bitmap))
             {
-                using (var backgroundBrush = new SolidBrush(bgColor)) graphics.FillRectangle(backgroundBrush, new Rectangle(0, 0, newBitmapWidth, newBitmapHeight));
+                graphics.Clear(Color.Transparent);
+
+                if (bgColor != Color.Transparent)
+                {
+                    using (var backgroundBrush = new SolidBrush(bgColor))
+                    {
+                        graphics.FillRectangle(backgroundBrush, new Rectangle(0, 0, newBitmapWidth, newBitmapHeight));
+                    }
+                }
 
                 graphics.CompositingMode = CompositingMode.SourceOver;
                 graphics.CompositingQuality = CompositingQuality.HighQuality;

@@ -18,6 +18,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Web;
 
@@ -45,7 +47,7 @@ namespace DynamicImageHandler.ImageParameters
         {
             var paramClass = new HiddenImageParameters();
 
-            paramClass.LoadParametersFromString(parameters);
+            paramClass.Parameters.AddRange(parameters.ParseParametersAsKeyValuePairs());
 
             // get the encoded parameters
             string encodedParams = paramClass.CreateEncodedParameterString();
@@ -55,17 +57,21 @@ namespace DynamicImageHandler.ImageParameters
         }
 
         /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
-        public override void AddCollection(HttpContext context)
+        public override void AppendRawParameters(IEnumerable<KeyValuePair<string, string>> values)
         {
-            // process the hidden class into a string...
-            string classData = context.Request.QueryString["id"];
+            if (values == null)
+            {
+                throw new ArgumentNullException("values");
+            }
 
-            if (string.IsNullOrEmpty(classData))
+            var kv = values.FirstOrDefault(s => s.Key == "id");
+
+            if (kv.IsDefault() || string.IsNullOrWhiteSpace(kv.Value))
             {
                 return;
             }
 
-            this.LoadEncodedParameterString(classData);
+            this.LoadEncodedParameterString(kv.Value);
         }
 
         /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
@@ -75,33 +81,11 @@ namespace DynamicImageHandler.ImageParameters
         }
 
         /// <exception cref="CryptographicException">The value of the <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Mode" /> parameter is not <see cref="F:System.Security.Cryptography.CipherMode.ECB" />, <see cref="F:System.Security.Cryptography.CipherMode.CBC" />, or <see cref="F:System.Security.Cryptography.CipherMode.CFB" />.</exception>
-        public virtual void LoadEncodedParameterString(string paramString)
+        protected virtual void LoadEncodedParameterString(string paramString)
         {
             string decrypted = SymCrypt.Decrypt(paramString, CurrentCryptKey);
-            this.LoadParametersFromString(decrypted);
-        }
 
-        public void LoadParametersFromString(string parameters)
-        {
-            var split = parameters.Split('&');
-
-            foreach (string item in split)
-            {
-                var vars = item.Split('=');
-
-                if (vars.Length == 2)
-                {
-                    // add or overwrite the variable...
-                    if (this.Parameters.ContainsKey(vars[0].ToLower()))
-                    {
-                        this.Parameters[vars[0].ToLower()] = vars[1];
-                    }
-                    else
-                    {
-                        this.Parameters.Add(vars[0].ToLower(), vars[1]);
-                    }
-                }
-            }
+            this.Parameters.AddRange(decrypted.ParseParametersAsKeyValuePairs());
         }
     }
 }
