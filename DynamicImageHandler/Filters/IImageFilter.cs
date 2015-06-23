@@ -1,7 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IImageFilter.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
+// Forked by Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,32 +22,23 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DynamicImageHandler
+using System.Drawing;
+using System.Web;
+
+using DynamicImageHandler.ImageParameters;
+
+namespace DynamicImageHandler.Filters
 {
-	using System.Drawing;
-	using System.Web;
+    /// <summary>
+    ///     Interface to define image filter. An image filter is an action that can be applied to an image
+    /// </summary>
+    public interface IImageFilter
+    {
+        /// <summary>
+        /// Lower is processed first.
+        /// </summary>
+        int Order { get; }
 
-	/// <summary>
-	/// 	Interface to define image filter. An image filter is an action that can be applied to an image
-	/// </summary>
-	public interface IImageFilter
-	{
-		#region Public Methods
-
-		/// <summary>
-		/// 	Returns true if modified
-		/// </summary>
-		/// <param name="parameters">
-		/// </param>
-		/// <param name="context">
-		/// </param>
-		/// <param name="bitmap">
-		/// </param>
-		/// <returns>
-		/// The process.
-		/// </returns>
-		bool Process(IImageParameters parameters, HttpContext context, ref Bitmap bitmap);
-
-		#endregion
-	}
+        bool Process(IImageParameters parameters, HttpContext context, ref Bitmap bitmap);
+    }
 }

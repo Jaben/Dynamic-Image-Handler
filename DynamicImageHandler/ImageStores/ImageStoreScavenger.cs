@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FileSystemHelpers.cs" company="">
+// <copyright file="ImageStoreScavanger.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
 // Forked by Jaben Cargman and CaptiveAire Systems
 //	
@@ -18,25 +18,53 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 // </copyright>
 // <summary>
-//   The file system helpers.
+//   The image store scavenger.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.IO;
-using System.Linq;
+using System;
 
-namespace DynamicImageHandler.Utils
+using DynamicImageHandler.Services;
+using DynamicImageHandler.Utils;
+
+namespace DynamicImageHandler.ImageStores
 {
-    internal class FileSystemHelpers
+    public abstract class ImageStoreScavenger : IScheduleTask
     {
-        internal static bool FileExists(string fileName)
+        protected ImageStoreScavenger(TimeSpan scavengeInterval, bool startInitialScavenge)
         {
-            return File.Exists(fileName);
+            this._scavengeInterval = scavengeInterval;
+            this._firstRun = startInitialScavenge;
         }
 
-        internal static string ToValidFileName(string key)
+        public bool ReoccurringTask
         {
-            return Path.GetInvalidFileNameChars().Aggregate(key, (current, c) => current.Replace(c, '_'));
+            get
+            {
+                return true;
+            }
+        }
+
+        protected abstract void CleanOldImages();
+
+        private readonly TimeSpan _scavengeInterval;
+
+        private bool _firstRun;
+
+        public DateTime GetNextReoccurrence()
+        {
+            if (this._firstRun)
+            {
+                this._firstRun = false;
+                return DateTime.Now.AddSeconds(10);
+            }
+
+            return DateTime.Now.Add(this._scavengeInterval);
+        }
+
+        public void RunTask()
+        {
+            this.CleanOldImages();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RotateFilter.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
+// Forked by Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,56 +22,31 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Drawing;
+using System.Web;
+
+using DynamicImageHandler.ImageParameters;
+
 namespace DynamicImageHandler.Filters
 {
-	#region Using
+    internal class RotateFilter : MappedParameterFilterBase<RotateFilterParameters>
+    {
+        public override bool ProcessMapped(RotateFilterParameters @params, HttpContext context, ref Bitmap bitmap)
+        {
+            bitmap = this.ImageTool.Rotate(bitmap, @params.Rotation ?? 0);
 
-	using System.Drawing;
-	using System.Globalization;
-	using System.Web;
+            return true;
+        }
+    }
 
-	#endregion
+    internal class RotateFilterParameters : IImageParameterMapping
+    {
+        [ParameterNames("rotate")]
+        public float? Rotation { get; set; }
 
-	/// <summary>
-	/// 	The rotate filter.
-	/// </summary>
-	internal class RotateFilter : IImageFilter
-	{
-		#region Public Methods
-
-		/// <summary>
-		/// 	The process.
-		/// </summary>
-		/// <param name="parameters">
-		/// 	The parameters.
-		/// </param>
-		/// <param name="context">
-		/// 	The context.
-		/// </param>
-		/// <param name="bitmap">
-		/// 	The bitmap.
-		/// </param>
-		/// <returns>
-		/// 	The process.
-		/// </returns>
-		public bool Process(IImageParameters parameters, HttpContext context, ref Bitmap bitmap)
-		{
-			if (parameters.Parameters.ContainsKey("rotate"))
-			{
-				string rotateParameter = parameters.Parameters["rotate"];
-
-				float angle;
-				if (float.TryParse(rotateParameter, NumberStyles.Float, CultureInfo.InvariantCulture, out angle))
-				{
-					IImageTool imageTool = Factory.GetImageTool();
-					bitmap = imageTool.Rotate(bitmap, angle);
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		#endregion
-	}
+        public bool IsValid()
+        {
+            return Rotation.HasValue;
+        }
+    }
 }

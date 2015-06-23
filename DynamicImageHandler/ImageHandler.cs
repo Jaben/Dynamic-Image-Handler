@@ -1,57 +1,68 @@
-﻿// DynamicImageHandler - Copyright (c) 2015 CaptiveAire
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ImageStoreScavanger.cs" company="">
+// Copyright (c) 2009-2010 Esben Carlsen
+// Forked by Jaben Cargman and CaptiveAire Systems
+//	
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+// </copyright>
+// <summary>
+//   The main event image handler
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Web;
 
 using DynamicImageHandler.Filters;
-using DynamicImageHandler.Utils;
+using DynamicImageHandler.ImageParameters;
+using DynamicImageHandler.ImageProviders;
+using DynamicImageHandler.ImageStores;
+using DynamicImageHandler.ImageTools;
 
 namespace DynamicImageHandler
 {
     /// <summary>
-    /// 	Http Handler
+    ///     Http Handler
     /// </summary>
     public class ImageHandler : IHttpHandler
     {
-        /// <summary>
-        /// 	Cache Manager Reference
-        /// </summary>
-        private static readonly IImageStore s_ImageStore = Factory.GetImageStore();
+        private static readonly IImageStore _imageStore = Factory.GetImageStore();
+
+        private static readonly IImageTool _imageTool = Factory.GetImageTool();
+
+        private readonly List<IImageFilter> _imageFilters = Factory.GetImageFilters().ToList();
 
         /// <summary>
-        /// 	The s_ image tool.
+        ///     Gets ImageFilters.
         /// </summary>
-        private static readonly IImageTool s_ImageTool = Factory.GetImageTool();
-
-        /// <summary>
-        /// 	The m_ image filters.
-        /// </summary>
-        private readonly List<IImageFilter> m_ImageFilters =
-            new List<IImageFilter>(
-                new IImageFilter[]
-                    {
-                        new ResizeFilter(), // Default Filters
-                        new ZoomFilter(), new RotateFilter(), new GreyScaleFilter(), new WatermarkFilter()
-                    });
-
-        /// <summary>
-        /// 	Gets ImageFilters.
-        /// </summary>
-        public IImageFilter[] ImageFilters
+        public IList<IImageFilter> ImageFilters
         {
             get
             {
-                return this.m_ImageFilters.ToArray();
+                return this._imageFilters;
             }
         }
 
         /// <summary>
-        /// 	Gets a value indicating whether IsReusable.
+        ///     Gets a value indicating whether IsReusable.
         /// </summary>
         public bool IsReusable
         {
@@ -62,12 +73,12 @@ namespace DynamicImageHandler
         }
 
         /// <summary>
-        /// 	Retrieve or update cache, and write to output stream
+        ///     Retrieve or update cache, and write to output stream
         /// </summary>
         /// <param name="context">
         /// </param>
         /// <exception cref="ApplicationException">
-        /// 	Unable to determine image parameter provider
+        ///     Unable to determine image parameter provider
         /// </exception>
         public void ProcessRequest(HttpContext context)
         {
@@ -101,16 +112,16 @@ namespace DynamicImageHandler
 
             ImageFormat imageFormat = GetImageFormat(parameters);
 
-            byte[] imageData = s_ImageStore.GetImageData(key);
-            if (imageData.IsNull())
+            var imageData = _imageStore.GetImageData(key);
+            if (imageData == null)
             {
                 imageData = this.GetImageData(parameters, context, imageFormat);
-                if (imageData.IsNull())
+                if (imageData == null)
                 {
                     return;
                 }
 
-                s_ImageStore.PutImageData(key, imageData);
+                _imageStore.PutImageData(key, imageData);
             }
 
             context.Response.Cache.SetCacheability(HttpCacheability.Public);
@@ -121,96 +132,113 @@ namespace DynamicImageHandler
         }
 
         /// <summary>
-        /// 	The add filter.
+        ///     The add filter.
         /// </summary>
         /// <param name="imageFilter">
-        /// 	The image filter.
+        ///     The image filter.
         /// </param>
         public void AddFilter(IImageFilter imageFilter)
         {
-            this.m_ImageFilters.Add(imageFilter);
+            if (imageFilter == null)
+            {
+                throw new ArgumentNullException("imageFilter");
+            }
+
+            this.ImageFilters.Add(imageFilter);
         }
 
         /// <summary>
-        /// 	The remove filter.
+        ///     The remove filter.
         /// </summary>
         /// <param name="imageFilter">
-        /// 	The image filter.
+        ///     The image filter.
         /// </param>
         public void RemoveFilter(IImageFilter imageFilter)
         {
-            this.m_ImageFilters.Remove(imageFilter);
+            if (imageFilter == null)
+            {
+                throw new ArgumentNullException("imageFilter");
+            }
+
+            this.ImageFilters.Remove(imageFilter);
         }
 
         /// <summary>
-        /// 	Check if the ETag that sent from the client is match to the current ETag.
-        /// 	If so, set the status code to 'Not Modified' and stop the response.
+        ///     Check if the ETag that sent from the client is match to the current ETag.
+        ///     If so, set the status code to 'Not Modified' and stop the response.
         /// </summary>
         /// <param name="context">
-        /// 	The context.
+        ///     The context.
         /// </param>
         /// <param name="eTagCode">
-        /// 	The e Tag Code.
+        ///     The e Tag Code.
         /// </param>
         /// <returns>
-        /// 	The check e tag.
+        ///     The check e tag.
         /// </returns>
         private static bool CheckETag(HttpContext context, string eTagCode)
         {
             string ifNoneMatch = context.Request.Headers["If-None-Match"];
-            if (eTagCode.Equals(ifNoneMatch, StringComparison.Ordinal))
+
+            if (!eTagCode.Equals(ifNoneMatch, StringComparison.Ordinal))
             {
-                context.Response.AppendHeader("Content-Length", "0");
-                context.Response.StatusCode = (int)HttpStatusCode.NotModified;
-                context.Response.StatusDescription = "Not modified";
-                context.Response.SuppressContent = true;
-                context.Response.Cache.SetCacheability(HttpCacheability.Public);
-                context.Response.Cache.SetETag(eTagCode);
-                context.Response.Cache.SetExpires(DateTime.Now.AddYears(1));
-                context.Response.End();
-                return true;
+                return false;
             }
 
-            return false;
+            context.Response.AppendHeader("Content-Length", "0");
+            context.Response.StatusCode = (int)HttpStatusCode.NotModified;
+            context.Response.StatusDescription = "Not modified";
+            context.Response.SuppressContent = true;
+            context.Response.Cache.SetCacheability(HttpCacheability.Public);
+            context.Response.Cache.SetETag(eTagCode);
+            context.Response.Cache.SetExpires(DateTime.Now.AddYears(1));
+            context.Response.End();
+
+            return true;
         }
 
         /// <summary>
-        /// 	The get image format.
+        ///     The get image format.
         /// </summary>
         /// <param name="parameters">
-        /// 	The parameters.
+        ///     The parameters.
         /// </param>
         /// <returns>
         /// </returns>
         private static ImageFormat GetImageFormat(IImageParameters parameters)
         {
-            if (parameters.Parameters.ContainsKey("format"))
+            if (!parameters.Parameters.ContainsKey("format"))
             {
-                string imageTypeParameter = parameters.Parameters["format"];
-                if (!string.IsNullOrEmpty(imageTypeParameter))
-                {
-                    switch (imageTypeParameter.ToLowerInvariant())
-                    {
-                        case "png":
-                            return ImageFormat.Png;
-                        case "gif":
-                            return ImageFormat.Gif;
-                        case "jpg":
-                            return ImageFormat.Jpeg;
-                        case "tif":
-                            return ImageFormat.Tiff;
-                    }
-                }
+                return ImageFormat.Jpeg;
+            }
+
+            string imageTypeParameter = parameters.Parameters["format"];
+
+            if (string.IsNullOrEmpty(imageTypeParameter))
+            {
+                return ImageFormat.Jpeg;
+            }
+
+            switch (imageTypeParameter.ToLowerInvariant())
+            {
+                case "png":
+                    return ImageFormat.Png;
+                case "gif":
+                    return ImageFormat.Gif;
+                case "jpg":
+                    return ImageFormat.Jpeg;
+                case "tif":
+                    return ImageFormat.Tiff;
             }
 
             return ImageFormat.Jpeg;
         }
 
         /// <summary>
-        /// 	Takes care of resizeing image from url parameters
+        ///     Takes care of resizing image from url parameters
         /// </summary>
         /// <param name="parameters">
-        /// 	The parameters.
+        ///     The parameters.
         /// </param>
         /// <param name="context">
         /// </param>
@@ -221,13 +249,13 @@ namespace DynamicImageHandler
         private byte[] GetImageData(IImageParameters parameters, HttpContext context, ImageFormat imageFormat)
         {
             IImageProvider provider = Factory.GetImageProvider();
-            if (provider.IsNull())
+            if (provider == null)
             {
                 throw new ApplicationException("Unable to determine image provider");
             }
 
-            byte[] data = provider.GetImageData(parameters);
-            if (data.IsNull())
+            var data = provider.GetImageData(parameters);
+            if (data == null)
             {
                 return null;
             }
@@ -235,7 +263,7 @@ namespace DynamicImageHandler
             using (var sourceImageData = new MemoryStream(data))
             {
                 var outputImg = (Bitmap)Image.FromStream(sourceImageData);
-                foreach (IImageFilter imageFilter in this.m_ImageFilters)
+                foreach (IImageFilter imageFilter in this._imageFilters)
                 {
                     Bitmap oldOutputImage = outputImg;
 
@@ -250,7 +278,7 @@ namespace DynamicImageHandler
                 using (outputImg)
                 {
                     // Encode image
-                    return s_ImageTool.Encode(outputImg, imageFormat);
+                    return _imageTool.Encode(outputImg, imageFormat);
                 }
             }
         }

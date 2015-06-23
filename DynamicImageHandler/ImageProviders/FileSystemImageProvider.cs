@@ -1,7 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FileSystemImageProvider.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
+// Forked by Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,99 +23,58 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.IO;
+using System.Web.Hosting;
+
+using DynamicImageHandler.ImageParameters;
+using DynamicImageHandler.Utils;
+
 namespace DynamicImageHandler.ImageProviders
 {
-	using System;
-	using System.IO;
-	using System.Web.Hosting;
+    internal class FileSystemImageProvider : IImageProvider
+    {
+        private const string ImageLastUpdatedKey = "ImageLastUpdated";
 
-	using DynamicImageHandler.Utils;
+        private string GetMappedFileFromParams(IImageParameters parameters)
+        {
+            if (string.IsNullOrEmpty(parameters.ImageSrc))
+            {
+                return null;
+            }
 
-	/// <summary>
-	/// 	File System Image Provider
-	/// 	Read data from darddrive
-	/// </summary>
-	internal class FileSystemImageProvider : IImageProvider
-	{
-		#region Constants and Fields
+            if (FileSystemHelpers.FileExists(parameters.ImageSrc))
+            {
+                return parameters.ImageSrc;
+            }
 
-		/// <summary>
-		/// The image last updated key.
-		/// </summary>
-		private const string ImageLastUpdatedKey = "ImageLastUpdated";
+            string filePath = HostingEnvironment.MapPath(parameters.ImageSrc);
 
-		#endregion
+            return FileSystemHelpers.FileExists(filePath) ? filePath : null;
+        }
 
-		#region Public Methods
+        public void AddImageLastUpdatedParameter(IImageParameters parameters)
+        {
+            string fileName = this.GetMappedFileFromParams(parameters);
 
-		/// <summary>
-		/// 	The get image last updated.
-		/// </summary>
-		/// <param name="parameters">
-		/// 	The parameters.
-		/// </param>
-		public void AddImageLastUpdatedParameter(IImageParameters parameters)
-		{
-			string fileName = this.GetMappedFileFromParams(parameters);
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                DateTime fileUpdated = File.GetLastWriteTimeUtc(fileName);
 
-			if (!string.IsNullOrEmpty(fileName))
-			{
-				DateTime fileUpdated = File.GetLastWriteTimeUtc(fileName);
+                if (parameters.Parameters.ContainsKey(ImageLastUpdatedKey))
+                {
+                    parameters.Parameters.Remove(ImageLastUpdatedKey);
+                }
 
-				if (parameters.Parameters.ContainsKey(ImageLastUpdatedKey))
-				{
-					parameters.Parameters.Remove(ImageLastUpdatedKey);
-				}
+                parameters.Parameters.Add(ImageLastUpdatedKey, fileUpdated.ToString());
+            }
+        }
 
-				parameters.Parameters.Add(ImageLastUpdatedKey, fileUpdated.ToString());
-			}
-		}
+        public byte[] GetImageData(IImageParameters parameters)
+        {
+            string fileName = this.GetMappedFileFromParams(parameters);
 
-		/// <summary>
-		/// 	The get image data.
-		/// </summary>
-		/// <param name="parameters">
-		/// 	The parameters.
-		/// </param>
-		/// <returns>
-		/// </returns>
-		public byte[] GetImageData(IImageParameters parameters)
-		{
-			string fileName = this.GetMappedFileFromParams(parameters);
-
-			return string.IsNullOrEmpty(fileName) ? null : File.ReadAllBytes(fileName);
-		}
-
-		#endregion
-
-		#region Methods
-
-		/// <summary>
-		/// 	The get mapped file from params.
-		/// </summary>
-		/// <param name="parameters">
-		/// 	The parameters.
-		/// </param>
-		/// <returns>
-		/// 	The get mapped file from params.
-		/// </returns>
-		private string GetMappedFileFromParams(IImageParameters parameters)
-		{
-			if (string.IsNullOrEmpty(parameters.ImageSrc))
-			{
-				return null;
-			}
-
-			if (FileSystemHelpers.FileExists(parameters.ImageSrc))
-			{
-				return parameters.ImageSrc;
-			}
-
-			string filePath = HostingEnvironment.MapPath(parameters.ImageSrc);
-
-			return FileSystemHelpers.FileExists(filePath) ? filePath : null;
-		}
-
-		#endregion
-	}
+            return string.IsNullOrEmpty(fileName) ? null : File.ReadAllBytes(fileName);
+        }
+    }
 }

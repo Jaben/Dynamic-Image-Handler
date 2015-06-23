@@ -1,5 +1,4 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FileSystemHelpers.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
 // Forked by Jaben Cargman and CaptiveAire Systems
 //	
@@ -15,28 +14,24 @@
 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-// </copyright>
-// <summary>
-//   The file system helpers.
-// </summary>
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.IO;
-using System.Linq;
+using System.Collections.Generic;
+using System.Web;
 
-namespace DynamicImageHandler.Utils
+namespace DynamicImageHandler.ImageParameters
 {
-    internal class FileSystemHelpers
+    public interface IImageParameters
     {
-        internal static bool FileExists(string fileName)
-        {
-            return File.Exists(fileName);
-        }
+        string this[string parameter] { get; }
 
-        internal static string ToValidFileName(string key)
-        {
-            return Path.GetInvalidFileNameChars().Aggregate(key, (current, c) => current.Replace(c, '_'));
-        }
+        string ImageSrc { get; }
+
+        string Key { get; }
+
+        IDictionary<string, string> Parameters { get; }
+
+        void AddCollection(HttpContext context);
     }
 }

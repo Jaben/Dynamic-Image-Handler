@@ -1,7 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ZoomFilter.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
+// Forked by Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,52 +22,36 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Drawing;
+using System.Web;
+
+using DynamicImageHandler.ImageParameters;
+
 namespace DynamicImageHandler.Filters
 {
-	using System.Drawing;
-	using System.Globalization;
-	using System.Web;
+    internal class ZoomFilter : MappedParameterFilterBase<ZoomFilterParameters>
+    {
+        public ZoomFilter()
+        {
+            this.ActualOrder = 5;
+        }
 
-	/// <summary>
-	/// The zoom filter.
-	/// </summary>
-	internal class ZoomFilter : IImageFilter
-	{
-		#region Public Methods
+        public override bool ProcessMapped(ZoomFilterParameters @params, HttpContext context, ref Bitmap bitmap)
+        {
+            bitmap = this.ImageTool.Zoom(bitmap, @params.Zoom ?? 1);
 
-		/// <summary>
-		/// The process.
-		/// </summary>
-		/// <param name="parameters">
-		/// The parameters.
-		/// </param>
-		/// <param name="context">
-		/// The context.
-		/// </param>
-		/// <param name="bitmap">
-		/// The bitmap.
-		/// </param>
-		/// <returns>
-		/// The process.
-		/// </returns>
-		public bool Process(IImageParameters parameters, HttpContext context, ref Bitmap bitmap)
-		{
-			if (parameters.Parameters.ContainsKey("zoom"))
-			{
-				string zoomParameter = parameters.Parameters["zoom"];
+            return true;
+        }
+    }
 
-				float zoomFactor;
-				if (float.TryParse(zoomParameter, NumberStyles.Float, CultureInfo.InvariantCulture, out zoomFactor))
-				{
-					IImageTool imageTool = Factory.GetImageTool();
-					bitmap = imageTool.Zoom(bitmap, zoomFactor);
-					return true;
-				}
-			}
+    internal class ZoomFilterParameters : IImageParameterMapping
+    {
+        [ParameterNames("zoom")]
+        public float? Zoom { get; set; }
 
-			return false;
-		}
-
-		#endregion
-	}
+        public bool IsValid()
+        {
+            return Zoom.HasValue;
+        }
+    }
 }

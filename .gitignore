@@ -184,3 +184,4 @@ UpgradeLog*.htm
 FakesAssemblies/
 *.ncrunchsolution
 /DynamicImageHandler.Web.Demo/App_Data
+*.ncrunchproject

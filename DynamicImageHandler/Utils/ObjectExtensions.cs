@@ -1,7 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ObjectExtensions.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
+// Forked by Jaben Cargman and CaptiveAire Systems and CaptiveAire
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,31 +22,20 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace DynamicImageHandler.Utils
 {
-	/// <summary>
-	/// The object extensions.
-	/// </summary>
-	public static class ObjectExtensions
-	{
-		#region Public Methods
+    public static class ObjectExtensions
+    {
+        public static bool IsDefault<T>(this T value)
+        {
+            return EqualityComparer<T>.Default.Equals(value, default(T));
+        }
 
-		/// <summary>
-		/// The is null.
-		/// </summary>
-		/// <param name="object">
-		/// The object.
-		/// </param>
-		/// <typeparam name="T">
-		/// </typeparam>
-		/// <returns>
-		/// The is null.
-		/// </returns>
-		public static bool IsNull<T>(this T @object)
-		{
-			return Equals(@object, null);
-		}
-
-		#endregion
-	}
+        public static bool IsNotDefault<T>(this T value)
+        {
+            return !EqualityComparer<T>.Default.Equals(value, default(T));
+        }
+    }
 }

@@ -1,7 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IImageParameters.cs" company="">
+// <copyright file="IImageTool.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
+// Forked by Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,61 +18,30 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 // </copyright>
 // <summary>
-//   The i image parameters.
+//   Interface defining basic image operations
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DynamicImageHandler
+using System.Drawing;
+using System.Drawing.Imaging;
+
+namespace DynamicImageHandler.ImageTools
 {
-	using System.Collections.Generic;
-	using System.Web;
+    /// <summary>
+    ///     Interface defining basic image operations
+    /// </summary>
+    public interface IImageTool
+    {
+        byte[] Encode(Bitmap source, ImageFormat imageFormat);
 
-	/// <summary>
-	/// The i image parameters.
-	/// </summary>
-	public interface IImageParameters
-	{
-		#region Public Properties
+        Bitmap Resize(Bitmap source, int? width, int? height, bool preservePerspective, bool keepSquare, Color bgColor);
 
-		/// <summary>
-		/// Gets ImageSrc.
-		/// </summary>
-		string ImageSrc { get; }
+        Bitmap Rotate(Bitmap source, float angle);
 
-		/// <summary>
-		/// Gets Key.
-		/// </summary>
-		string Key { get; }
+        Bitmap ToGreyScale(Bitmap source);
 
-		/// <summary>
-		/// Gets Parameters.
-		/// </summary>
-		IDictionary<string, string> Parameters { get; }
+        Bitmap Watermark(Bitmap source, string watermarkText, float fontSize, int alpha, Color color);
 
-		#endregion
-
-		#region Public Indexers
-
-		/// <summary>
-		/// The this.
-		/// </summary>
-		/// <param name="parameter">
-		/// The parameter.
-		/// </param>
-		string this[string parameter] { get; }
-
-		#endregion
-
-		#region Public Methods
-
-		/// <summary>
-		/// The add collection.
-		/// </summary>
-		/// <param name="context">
-		/// The context.
-		/// </param>
-		void AddCollection(HttpContext context);
-
-		#endregion
-	}
+        Bitmap Zoom(Bitmap source, float zoomFactor);
+    }
 }

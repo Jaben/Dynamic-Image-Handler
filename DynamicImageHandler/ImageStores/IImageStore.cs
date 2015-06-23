@@ -1,7 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IImageStore.cs" company="">
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
+// Forked by Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,36 +22,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DynamicImageHandler
+namespace DynamicImageHandler.ImageStores
 {
-	/// <summary>
-	/// 	Interface defining classes to store and retrieve image data from a cache store
-	/// </summary>
-	public interface IImageStore
-	{
-		#region Public Methods
+    /// <summary>
+    ///     Interface defining classes to store and retrieve image data from a cache store
+    /// </summary>
+    public interface IImageStore
+    {
+        byte[] GetImageData(string key);
 
-		/// <summary>
-		/// The get image data.
-		/// </summary>
-		/// <param name="key">
-		/// The key.
-		/// </param>
-		/// <returns>
-		/// </returns>
-		byte[] GetImageData(string key);
-
-		/// <summary>
-		/// The put image data.
-		/// </summary>
-		/// <param name="key">
-		/// The key.
-		/// </param>
-		/// <param name="imageData">
-		/// The image data.
-		/// </param>
-		void PutImageData(string key, byte[] imageData);
-
-		#endregion
-	}
+        void PutImageData(string key, byte[] imageData);
+    }
 }

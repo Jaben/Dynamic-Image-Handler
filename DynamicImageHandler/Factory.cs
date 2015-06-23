@@ -1,165 +1,126 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Factory.cs" company="">
-// Copyright (c) 2009-2010 Esben Carlsen
-// Forked by Jaben Cargman
-//	
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+﻿// DynamicImageHandler - Copyright (c) 2015 CaptiveAire
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Reflection;
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-// </copyright>
-// <summary>
-//   Generic factory class for creating IImageStore, IImageTool and IImageProvider
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+using DynamicImageHandler.Filters;
+using DynamicImageHandler.ImageParameters;
+using DynamicImageHandler.ImageProviders;
+using DynamicImageHandler.ImageStores;
+using DynamicImageHandler.ImageTools;
+using DynamicImageHandler.Properties;
 
 namespace DynamicImageHandler
 {
-	using System;
-	using System.Configuration;
+    public class Factory
+    {
+        private static readonly object _syncLock = new object();
 
-	using DynamicImageHandler.Properties;
-	using DynamicImageHandler.Utils;
+        private static volatile IImageProvider _imageProvider;
 
-	/// <summary>
-	/// 	Generic factory class for creating IImageStore, IImageTool and IImageProvider
-	/// </summary>
-	public class Factory
-	{
-	    /// <summary>
-		/// The s_ sync lock.
-		/// </summary>
-		private static readonly object s_SyncLock = new object();
+        private static volatile IImageStore _imageStore;
 
-		/// <summary>
-		/// The s_ image provider.
-		/// </summary>
-		private static IImageProvider s_ImageProvider;
+        private static volatile IImageTool _imageTool;
 
-		/// <summary>
-		/// The s_ image store.
-		/// </summary>
-		private static IImageStore s_ImageStore;
+        private static volatile IImageFilter[] _imageFilters;
 
-		/// <summary>
-		/// The s_ image tool.
-		/// </summary>
-		private static IImageTool s_ImageTool;
+        private static volatile Func<IImageParameters> _createParameters;
 
-	    /// <summary>
-		/// 	Creates an unique instance of the image parameter class...
-		/// </summary>
-		/// <returns>
-		/// </returns>
-		public static IImageParameters GetImageParameters()
-		{
-			Type imageParamters = Type.GetType(Settings.Default.ImageParametersType);
-			if (imageParamters == null)
-			{
-				throw new ConfigurationErrorsException(
-					string.Format("Unable to resolve image tool type: {0}", Settings.Default.ImageParametersType));
-			}
+        /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+        public static IImageParameters GetImageParameters()
+        {
+            if (_createParameters == null)
+            {
+                lock (_syncLock)
+                {
+                    if (_createParameters == null)
+                    {
+                        _createParameters = () => ActivateType<IImageParameters>(Settings.Default.ImageParametersType);
+                    }
+                }
+            }
 
-			return Activator.CreateInstance(imageParamters) as IImageParameters;
-		}
+            return _createParameters();
+        }
 
-		/// <summary>
-		/// The get image provider.
-		/// </summary>
-		/// <returns>
-		/// </returns>
-		/// <exception cref="ConfigurationErrorsException">
-		/// </exception>
-		public static IImageProvider GetImageProvider()
-		{
-			if (s_ImageProvider.IsNull())
-			{
-				lock (s_SyncLock)
-				{
-					if (s_ImageProvider.IsNull())
-					{
-						Type imageProviderType = Type.GetType(Settings.Default.ImageProviderType);
-						if (imageProviderType.IsNull())
-						{
-							throw new ConfigurationErrorsException(
-								string.Format("Unable to resolve image provider type: {0}", Settings.Default.ImageProviderType));
-						}
+        public static IImageProvider GetImageProvider()
+        {
+            if (_imageProvider != null)
+            {
+                return _imageProvider;
+            }
 
-						s_ImageProvider = Activator.CreateInstance(imageProviderType) as IImageProvider;
-					}
-				}
-			}
+            lock (_syncLock)
+            {
+                return _imageProvider ?? (_imageProvider = ActivateType<IImageProvider>(Settings.Default.ImageProviderType));
+            }
+        }
 
-			return s_ImageProvider;
-		}
+        public static IImageStore GetImageStore()
+        {
+            if (_imageStore != null)
+            {
+                return _imageStore;
+            }
 
-		/// <summary>
-		/// The get image store.
-		/// </summary>
-		/// <returns>
-		/// </returns>
-		/// <exception cref="ConfigurationErrorsException">
-		/// </exception>
-		public static IImageStore GetImageStore()
-		{
-			if (s_ImageStore.IsNull())
-			{
-				lock (s_SyncLock)
-				{
-					if (s_ImageStore.IsNull())
-					{
-						Type imageStoreType = Type.GetType(Settings.Default.ImageStoreType);
-						if (imageStoreType.IsNull())
-						{
-							throw new ConfigurationErrorsException(
-								string.Format("Unable to resolve image store type: {0}", Settings.Default.ImageStoreType));
-						}
+            lock (_syncLock)
+            {
+                return _imageStore ?? (_imageStore = ActivateType<IImageStore>(Settings.Default.ImageStoreType));
+            }
+        }
 
-						s_ImageStore = Activator.CreateInstance(imageStoreType) as IImageStore;
-					}
-				}
-			}
+        private static T ActivateType<T>(string type) where T : class
+        {
+            Type activateType = Type.GetType(type);
 
-			return s_ImageStore;
-		}
+            if (activateType == null)
+            {
+                throw new ConfigurationErrorsException(string.Format("Unable to resolve image store type: {0}", type));
+            }
 
-		/// <summary>
-		/// The get image tool.
-		/// </summary>
-		/// <returns>
-		/// </returns>
-		/// <exception cref="ConfigurationErrorsException">
-		/// </exception>
-		public static IImageTool GetImageTool()
-		{
-			if (s_ImageTool.IsNull())
-			{
-				lock (s_SyncLock)
-				{
-					if (s_ImageTool.IsNull())
-					{
-						Type imageToolType = Type.GetType(Settings.Default.ImageToolType);
-						if (imageToolType.IsNull())
-						{
-							throw new ConfigurationErrorsException(
-								string.Format("Unable to resolve image tool type: {0}", Settings.Default.ImageToolType));
-						}
+            return Activator.CreateInstance(activateType) as T;
+        }
 
-						s_ImageTool = Activator.CreateInstance(imageToolType) as IImageTool;
-					}
-				}
-			}
+        public static IEnumerable<IImageFilter> GetImageFilters()
+        {
+            if (_imageFilters == null)
+            {
+                lock (_syncLock)
+                {
+                    if (_imageFilters == null)
+                    {
+                        var imageFilterTypes =
+                            Assembly.GetExecutingAssembly()
+                                .GetTypes()
+                                .Where(
+                                    s =>
+                                    s.Namespace != null && !s.IsAbstract && s.IsClass
+                                    && s.GetInterfaces().Any(i => i == typeof(IImageFilter)))
+                                .Distinct()
+                                .ToList();
 
-			return s_ImageTool;
-		}
-	}
+                        _imageFilters = imageFilterTypes.Select(i => Activator.CreateInstance(i) as IImageFilter).ToArray();
+                    }
+                }
+            }
+
+            return _imageFilters;
+        }
+
+        public static IImageTool GetImageTool()
+        {
+            if (_imageTool != null)
+            {
+                return _imageTool;
+            }
+
+            lock (_syncLock)
+            {
+                return _imageTool ?? (_imageTool = ActivateType<IImageTool>(Settings.Default.ImageToolType));
+            }
+        }
+    }
 }

@@ -86,35 +86,39 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factory.cs" />
-    <Compile Include="Filters\GreyScaleFilter.cs" />
+    <Compile Include="Filters\GrayscaleFilter.cs" />
+    <Compile Include="Filters\MappedParameterFilterBase.cs" />
     <Compile Include="Filters\ResizeFilter.cs" />
     <Compile Include="Filters\RotateFilter.cs" />
     <Compile Include="Filters\WatermarkFilter.cs" />
     <Compile Include="Filters\ZoomFilter.cs" />
-    <Compile Include="Interfaces\IImageFilter.cs" />
-    <Compile Include="Interfaces\IImageParameters.cs" />
-    <Compile Include="Interfaces\IImageTool.cs" />
+    <Compile Include="Filters\IImageFilter.cs" />
+    <Compile Include="ImageParameters\IImageParameterMapping.cs" />
+    <Compile Include="ImageParameters\IImageParameters.cs" />
+    <Compile Include="ImageParameters\ImageParameterExtensions.cs" />
+    <Compile Include="ImageParameters\ParameterNamesAttribute.cs" />
+    <Compile Include="ImageTools\IImageTool.cs" />
     <Compile Include="ImageHandler.cs" />
     <Compile Include="ImageParameters\HiddenImageParameters.cs" />
     <Compile Include="ImageParameters\SimpleImageParameters.cs" />
+    <Compile Include="Utils\ISymCryptKey.cs" />
     <Compile Include="Utils\SymCrypt.cs" />
     <Compile Include="Utils\SymCryptKey.cs" />
     <Compile Include="ImageStores\FileSystemImageStore.cs" />
     <Compile Include="ImageProviders\FileSystemImageProvider.cs" />
-    <Compile Include="Interfaces\IImageProvider.cs" />
-    <Compile Include="Interfaces\IImageStore.cs" />
+    <Compile Include="ImageProviders\IImageProvider.cs" />
+    <Compile Include="ImageStores\IImageStore.cs" />
     <Compile Include="ImageTools\NativeImageTool.cs" />
-    <Compile Include="ImageStores\ImageStoreScavanger.cs" />
+    <Compile Include="ImageStores\ImageStoreScavenger.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Utils\AppScheduler.cs" />
+    <Compile Include="Services\AppScheduler.cs" />
     <Compile Include="Utils\FileSystemHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\IEnumerableExtensions.cs" />
-    <Compile Include="Utils\IScheduleTask.cs" />
+    <Compile Include="Services\IScheduleTask.cs" />
     <Compile Include="Utils\ObjectExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
