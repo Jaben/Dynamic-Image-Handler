@@ -14,7 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{5F6ECA50-38F4-40D9-B27B-D8ABFDA6DDF3}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		DynamicImageHandler.nuspec = DynamicImageHandler.nuspec
+		Dynamic.Image.Handler.nuspec = Dynamic.Image.Handler.nuspec
 		DynamicImageHandler.sln.DotSettings = DynamicImageHandler.sln.DotSettings
 		Readme.md = Readme.md
 	EndProjectSection

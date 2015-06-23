@@ -4,5 +4,5 @@ before_build:
 - nuget restore
 
 after_build:
-- nuget pack DynamicImageHandler.nuspec -version %APPVEYOR_BUILD_VERSION%
-- appveyor PushArtifact DynamicImageHandler.%APPVEYOR_BUILD_VERSION%.nupkg
+- nuget pack Dynamic.Image.Handler.nuspec -version %APPVEYOR_BUILD_VERSION%
+- appveyor PushArtifact Dynamic.Image.Handler.%APPVEYOR_BUILD_VERSION%.nupkg
