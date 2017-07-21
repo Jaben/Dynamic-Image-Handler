@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
+// Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,23 +28,11 @@ namespace DynamicImageHandler.Filters
     public abstract class MappedParameterFilterBase<TParams> : IImageFilter
         where TParams : IImageParameterMapping, new()
     {
-        protected IImageTool ImageTool
-        {
-            get
-            {
-                return Factory.ImageTool;
-            }
-        }
+        protected IImageTool ImageTool => Factory.ImageTool;
 
         protected int ActualOrder = 10;
 
-        public virtual int Order
-        {
-            get
-            {
-                return this.ActualOrder;
-            }
-        }
+        public virtual int Order => this.ActualOrder;
 
         public virtual bool Process(IImageParameters parameters, HttpContext context, ref Bitmap bitmap)
         {

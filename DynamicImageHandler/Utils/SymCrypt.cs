@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
+// Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

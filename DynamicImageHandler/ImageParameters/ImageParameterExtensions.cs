@@ -1,6 +1,6 @@
 // // --------------------------------------------------------------------------------------------------------------------
 // // Copyright (c) 2009-2010 Esben Carlsen
-// // Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
+// // Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems
 // // 
 // // This library is free software; you can redistribute it and/or
 // // modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 // // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Imaging;
@@ -88,6 +89,9 @@ namespace DynamicImageHandler.ImageParameters
             return imageParameters.GetValueOrEmpty("src");
         }
 
+        static ConcurrentDictionary<Type, KeyValuePair<string, Action<object, string>>[]> _mappedParameterLookup =
+            new ConcurrentDictionary<Type, KeyValuePair<string, Action<object, string>>[]>();
+
         /// <exception cref="TargetInvocationException">An error occurred while setting the property value. For example, an index value specified for an indexed property is out of range. The <see cref="P:System.Exception.InnerException" /> property indicates the reason for the error.</exception>
         /// <exception cref="MethodAccessException">There was an illegal attempt to access a private or protected method inside a class. </exception>
         /// <exception cref="TargetParameterCountException">The number of parameters in <paramref name="index" /> does not match the number of parameters the indexed property takes. </exception>
@@ -103,44 +107,53 @@ namespace DynamicImageHandler.ImageParameters
                 throw new ArgumentNullException("parameters");
             }
 
+            var mappings = _mappedParameterLookup.GetOrAdd(typeof(T), paramObjectType => GetParameterMappings(paramObjectType).ToArray());
+
             var mappedParamObj = new T();
-            var properties =
-                mappedParamObj.GetType()
-                    .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
 
-            foreach (var p in properties)
+            foreach (var map in mappings)
             {
-                var paramNames =
-                    p.GetCustomAttributes(typeof(ParameterNamesAttribute), true)
-                        .OfType<ParameterNamesAttribute>()
-                        .SelectMany(_ => _.Names)
-                        .Concat(new[] { p.Name.ToLower() })
-                        .Distinct()
-                        .ToList();
-
-                foreach (var name in paramNames)
+                string stringValue;
+                if (parameters.Parameters.TryGetValue(map.Key, out stringValue) && !string.IsNullOrWhiteSpace(stringValue))
                 {
-                    string strValue;
-                    if (parameters.Parameters.TryGetValue(name, out strValue) && !string.IsNullOrWhiteSpace(strValue))
-                    {
-                        // map value...
-                        try
-                        {
-                            object value = ConvertValue(p.PropertyType, strValue.Trim());
-                            p.SetValue(mappedParamObj, value, null);
-                        }
-                        catch (InvalidCastException)
-                        {
-                            // do nothing
-                        }
-                    }
+                    map.Value(mappedParamObj, stringValue);
                 }
             }
 
             return mappedParamObj;
         }
 
-        private static object ConvertValue(Type conversionType, string strValue)
+        static IEnumerable<KeyValuePair<string, Action<object, string>>> GetParameterMappings(Type paramObjectType)
+        {
+            var properties = paramObjectType
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
+
+            foreach (var p in properties)
+            {
+                var paramNames = p.GetCustomAttributes(typeof(ParameterNamesAttribute), true).OfType<ParameterNamesAttribute>()
+                    .SelectMany(_ => _.Names).Concat(new[] { p.Name.ToLower() }).Distinct().ToList();
+
+                foreach (var name in paramNames)
+                {
+                    yield return new KeyValuePair<string, Action<object, string>>(
+                        name,
+                        (o, s) =>
+                            {
+                                try
+                                {
+                                    object value = ConvertValue(p.PropertyType, s.Trim());
+                                    p.SetValue(o, value, null);
+                                }
+                                catch (InvalidCastException)
+                                {
+                                    // do nothing
+                                }
+                            });
+                }
+            }
+        }
+
+        static object ConvertValue(Type conversionType, string stringValue)
         {
             if (conversionType.IsGenericType && conversionType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -151,17 +164,17 @@ namespace DynamicImageHandler.ImageParameters
             {
                 // special handling for bool
                 bool bv;
-                if (bool.TryParse(strValue, out bv))
+                if (bool.TryParse(stringValue, out bv))
                 {
                     return bv;
                 }
 
-                if (strValue == "1")
+                if (stringValue == "1")
                 {
                     return true;
                 }
 
-                if (strValue == "0")
+                if (stringValue == "0")
                 {
                     return false;
                 }
@@ -169,13 +182,13 @@ namespace DynamicImageHandler.ImageParameters
             else if (conversionType == typeof(float))
             {
                 float f;
-                if (float.TryParse(strValue, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
+                if (float.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
                 {
                     return f;
                 }
             }
 
-            return Convert.ChangeType(strValue, conversionType);
+            return Convert.ChangeType(stringValue, conversionType);
         }
     }
 }

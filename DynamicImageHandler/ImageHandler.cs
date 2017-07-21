@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
+// Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -49,24 +49,12 @@ namespace DynamicImageHandler
         /// <summary>
         ///     Gets ImageFilters.
         /// </summary>
-        public IList<IImageFilter> ImageFilters
-        {
-            get
-            {
-                return this._imageFilters;
-            }
-        }
+        public IList<IImageFilter> ImageFilters => this._imageFilters;
 
         /// <summary>
         ///     Gets a value indicating whether IsReusable.
         /// </summary>
-        public bool IsReusable
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsReusable => false;
 
         /// <summary>
         ///     Retrieve or update cache, and write to output stream
@@ -99,7 +87,7 @@ namespace DynamicImageHandler
 
             string key = parameters.Key;
 
-            string eTag = string.Format(@"""{0}""", key);
+            string eTag = $@"""{key}""";
 
             if (CheckETag(context, eTag))
             {

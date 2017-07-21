@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
+// Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ namespace DynamicImageHandler.Utils
 
             return string.Join(
                 "&",
-                parameters.Where(kv => !string.IsNullOrEmpty(kv.Value)).Select(kv => string.Format("{0}={1}", kv.Key.ToLower(), kv.Value)));
+                parameters.Where(kv => !string.IsNullOrEmpty(kv.Value)).Select(kv => $"{kv.Key.ToLower()}={kv.Value}"));
         }
 
         public static IEnumerable<KeyValuePair<string, string>> ParseParametersAsKeyValuePairs(this string parameters)
@@ -71,7 +71,7 @@ namespace DynamicImageHandler.Utils
                 }
 
                 yield return new KeyValuePair<string, string>(vars[0].Trim().ToLower(), vars[1]);
-            }            
+            }
         }
 
         public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEnumerable<KeyValuePair<TKey, TValue>> values)

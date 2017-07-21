@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // Copyright (c) 2009-2010 Esben Carlsen
-// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
+// Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems
 //	
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,21 +31,9 @@ namespace DynamicImageHandler.ImageParameters
     {
         private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
 
-        public virtual string Key
-        {
-            get
-            {
-                return this.MD5HashString(this.ParametersAsString(), 64);
-            }
-        }
+        public virtual string Key => this.MD5HashString(this.ParametersAsString(), 64);
 
-        public virtual IDictionary<string, string> Parameters
-        {
-            get
-            {
-                return this._parameters;
-            }
-        }
+        public virtual IDictionary<string, string> Parameters => this._parameters;
 
         public virtual void AppendRawParameters(IEnumerable<KeyValuePair<string,string>> values)
         {
