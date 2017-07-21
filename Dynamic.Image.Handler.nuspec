@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata>
-    <id>Dynamic.Image.Handler</id>
-    <version>3.1.0</version>
-    <authors>CaptiveAire Systems</authors>
-    <licenseUrl>http://www.gnu.org/licenses/old-licenses/lgpl-2.0.en.html</licenseUrl>
-    <projectUrl>https://github.com/CaptiveAire/Dynamic-Image-Handler</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Dynamic Image Handler for .NET (ASP and MVC) supporting resizing and watermarking</description>
-    <language>en-US</language>
-    <tags>image server handler resizing</tags>
-    <dependencies>
-      <dependency id="VVVV.FreeImage" version="3.15.1.1" />
-    </dependencies>
-  </metadata>
-  <files>
-    <file src="DynamicImageHandler\bin\Release\DynamicImageHandler.dll" target="lib\net40\DynamicImageHandler.dll" />
-    <file src="DynamicImageHandler.ImageTool.FreeImage\bin\Release\DynamicImageHandler.ImageTool.FreeImage.dll" target="lib\net40\DynamicImageHandler.ImageTool.FreeImage.dll" />
-    <file src="DynamicImageHandler.ImageTool.Wpf\bin\Release\DynamicImageHandler.ImageTool.Wpf.dll" target="lib\net40\DynamicImageHandler.ImageTool.Wpf.dll" />
-  </files>
+    <metadata>
+        <id>Dynamic.Image.Handler</id>
+        <version>3.1.0</version>
+        <authors>CaptiveAire Systems</authors>
+        <licenseUrl>http://www.gnu.org/licenses/old-licenses/lgpl-2.0.en.html</licenseUrl>
+        <projectUrl>https://github.com/CaptiveAire/Dynamic-Image-Handler</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Dynamic Image Handler for .NET (ASP and MVC) supporting resizing and watermarking</description>
+        <language>en-US</language>
+        <tags>image server handler resizing</tags>
+        <dependencies>
+            <dependency id="VVVV.FreeImage" version="3.15.1.1" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="DynamicImageHandler\bin\Release\net452\DynamicImageHandler.dll" target="lib\net452\DynamicImageHandler.dll" />
+        <file src="DynamicImageHandler\bin\Release\net452\DynamicImageHandler.dll.config" target="lib\net452\DynamicImageHandler.dll.config" />
+        <file src="DynamicImageHandler.ImageTool.FreeImage\bin\Release\net452\DynamicImageHandler.ImageTool.FreeImage.dll" target="lib\net452\DynamicImageHandler.ImageTool.FreeImage.dll" />
+        <file src="DynamicImageHandler.ImageTool.Wpf\bin\Release\net452\DynamicImageHandler.ImageTool.Wpf.dll" target="lib\net452\DynamicImageHandler.ImageTool.Wpf.dll" />
+    </files>
 </package>
