@@ -44,6 +44,17 @@ namespace DynamicImageHandler.Utils
             }
         }
 
+        /// <summary>
+        /// If the enumerable is null, returns an empty enumerable.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <returns></returns>
+        public static IEnumerable<T> IfNullEmpty<T>(this IEnumerable<T> enumerable)
+        {
+            return enumerable ?? Enumerable.Empty<T>();
+        }
+
         public static string ToQueryString(this IDictionary<string, string> parameters)
         {
             if (parameters == null)

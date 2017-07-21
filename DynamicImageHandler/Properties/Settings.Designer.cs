@@ -85,7 +85,18 @@ namespace DynamicImageHandler.Properties {
                 return ((string)(this["ImageParametersType"]));
             }
         }
-        
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DynamicImageHandler.ImageProcessor.ImageProcessor, DynamicImageHandler<")]
+        public string ImageProcessorType
+        {
+            get
+            {
+                return ((string)(this["ImageProcessorType"]));
+            }
+        }
+
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("PLEASE_CHANGE_ME_IMMEDIATELY!")]

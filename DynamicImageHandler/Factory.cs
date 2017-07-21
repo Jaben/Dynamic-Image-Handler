@@ -28,6 +28,7 @@ using System.Threading;
 
 using DynamicImageHandler.Filters;
 using DynamicImageHandler.ImageParameters;
+using DynamicImageHandler.ImageProcessors;
 using DynamicImageHandler.ImageProviders;
 using DynamicImageHandler.ImageStores;
 using DynamicImageHandler.ImageTools;
@@ -51,6 +52,10 @@ namespace DynamicImageHandler
                 () => ActivateTypeFromString<IImageTool>(Settings.Default.ImageToolType),
                 LazyThreadSafetyMode.ExecutionAndPublication);
 
+            _imageProcessor = new Lazy<IImageProcessor>(
+                () => ActivateTypeFromString<IImageProcessor>(Settings.Default.ImageProcessorType),
+                LazyThreadSafetyMode.ExecutionAndPublication);
+
             _imageFilters = new Lazy<IImageFilter[]>(() => LoadImageFilters(), LazyThreadSafetyMode.ExecutionAndPublication);
 
             _createParameters = () => ActivateTypeFromString<IImageParameters>(Settings.Default.ImageParametersType);
@@ -63,6 +68,8 @@ namespace DynamicImageHandler
         static readonly Lazy<IImageTool> _imageTool;
 
         static readonly Lazy<IImageFilter[]> _imageFilters;
+
+        static readonly Lazy<IImageProcessor> _imageProcessor;
 
         static readonly Func<IImageParameters> _createParameters;
 
@@ -116,11 +123,12 @@ namespace DynamicImageHandler
 
         #region Public Properties
         
-        public static IImageParameters ImageParameter => _createParameters();
+        public static IImageParameters GetImageParameter => _createParameters();
         public static IImageProvider ImageProvider => _imageProvider.Value;
         public static IImageStore ImageStore => _imageStore.Value;
         public static IImageTool ImageTool => _imageTool.Value;
         public static IEnumerable<IImageFilter> ImageFilters => _imageFilters.Value;
+        public static IImageProcessor ImageProcessor => _imageProcessor.Value;
 
         #endregion
     }

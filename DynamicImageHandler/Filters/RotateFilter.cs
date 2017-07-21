@@ -26,7 +26,7 @@ namespace DynamicImageHandler.Filters
 {
     internal class RotateFilter : MappedParameterFilterBase<RotateFilterParameters>
     {
-        public override bool ProcessMapped(RotateFilterParameters @params, HttpContext context, ref Bitmap bitmap)
+        public override bool ProcessMapped(RotateFilterParameters @params, ref Bitmap bitmap)
         {
             bitmap = this.ImageTool.Rotate(bitmap, @params.Rotation ?? 0);
 

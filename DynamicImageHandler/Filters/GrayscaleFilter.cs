@@ -26,7 +26,7 @@ namespace DynamicImageHandler.Filters
 {
     internal class GrayscaleFilter : MappedParameterFilterBase<GrayscaleFilterParameters>
     {
-        public override bool ProcessMapped(GrayscaleFilterParameters @params, HttpContext context, ref Bitmap bitmap)
+        public override bool ProcessMapped(GrayscaleFilterParameters @params, ref Bitmap bitmap)
         {
             bitmap = this.ImageTool.ToGreyScale(bitmap);
 

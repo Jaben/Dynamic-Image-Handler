@@ -1,7 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)"
-              GeneratedClassNamespace="DynamicImageHandler.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DynamicImageHandler.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="ImageToolType" Type="System.String" Scope="Application">
@@ -27,6 +25,9 @@
     </Setting>
     <Setting Name="ImageParameterKey" Type="System.String" Scope="Application">
       <Value Profile="(Default)">PLEASE_CHANGE_ME_IMMEDIATELY!</Value>
+    </Setting>
+    <Setting Name="ImageProcessorType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DynamicImageHandler.ImageProcessor.ImageProcessor, DynamicImageHandler</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -31,7 +31,7 @@ namespace DynamicImageHandler.Filters
             this.ActualOrder = 5;
         }
 
-        public override bool ProcessMapped(ZoomFilterParameters @params, HttpContext context, ref Bitmap bitmap)
+        public override bool ProcessMapped(ZoomFilterParameters @params, ref Bitmap bitmap)
         {
             bitmap = this.ImageTool.Zoom(bitmap, @params.Zoom ?? 1);
 

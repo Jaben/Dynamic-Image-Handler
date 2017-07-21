@@ -32,7 +32,7 @@ namespace DynamicImageHandler.Filters
             this.ActualOrder = 5;
         }
 
-        public override bool ProcessMapped(ResizeFilterParameters @params, HttpContext context, ref Bitmap bitmap)
+        public override bool ProcessMapped(ResizeFilterParameters @params, ref Bitmap bitmap)
         {
             int imageResizeWidth = @params.Width ?? 0;
             int imageResizeHeight = @params.Height ?? 0;

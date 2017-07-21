@@ -34,7 +34,7 @@ namespace DynamicImageHandler.Filters
 
         public virtual int Order => this.ActualOrder;
 
-        public virtual bool Process(IImageParameters parameters, HttpContext context, ref Bitmap bitmap)
+        public virtual bool Process(IImageParameters parameters, ref Bitmap bitmap)
         {
             var mapParameter = parameters.MapParameter<TParams>();
 
@@ -43,9 +43,9 @@ namespace DynamicImageHandler.Filters
                 return false;
             }
 
-            return ProcessMapped(mapParameter, context, ref bitmap);
+            return ProcessMapped(mapParameter, ref bitmap);
         }
 
-        public abstract bool ProcessMapped(TParams @params, HttpContext context, ref Bitmap bitmap);
+        public abstract bool ProcessMapped(TParams @params, ref Bitmap bitmap);
     }
 }

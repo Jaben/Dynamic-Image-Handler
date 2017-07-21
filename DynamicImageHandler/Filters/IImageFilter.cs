@@ -34,6 +34,6 @@ namespace DynamicImageHandler.Filters
         /// </summary>
         int Order { get; }
 
-        bool Process(IImageParameters parameters, HttpContext context, ref Bitmap bitmap);
+        bool Process(IImageParameters parameters, ref Bitmap bitmap);
     }
 }

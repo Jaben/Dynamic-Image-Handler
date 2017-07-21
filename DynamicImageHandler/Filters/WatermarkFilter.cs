@@ -33,7 +33,7 @@ namespace DynamicImageHandler.Filters
             this.ActualOrder = 100;
         }
 
-        public override bool ProcessMapped(WatermarkFilterParameters @params, HttpContext context, ref Bitmap bitmap)
+        public override bool ProcessMapped(WatermarkFilterParameters @params, ref Bitmap bitmap)
         {
             bitmap = this.ImageTool.Watermark(bitmap, @params.Watermark, @params.FontSize, @params.GetWatermarkAlpha(), @params.GetWatermarkColor());
             return true;
