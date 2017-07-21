@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly : AssemblyConfiguration("")]
 [assembly : AssemblyCompany("")]
 [assembly: AssemblyProduct("DynamicImageHandler.ImageTool.Wpf")]
-[assembly : AssemblyCopyright("Copyright ©  2009")]
+[assembly : AssemblyCopyright("Copyright © CaptiveAire 2017")]
 [assembly : AssemblyTrademark("")]
 [assembly : AssemblyCulture("")]
 

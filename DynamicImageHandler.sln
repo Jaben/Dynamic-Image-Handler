@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicImageHandler", "DynamicImageHandler\DynamicImageHandler.csproj", "{EB46873F-DFB7-48EC-97EE-1A3BDF628B5B}"
 EndProject
@@ -9,14 +9,35 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicImageHandler.ImageTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicImageHandler.ImageTool.Wpf", "DynamicImageHandler.ImageTool.Wpf\DynamicImageHandler.ImageTool.Wpf.csproj", "{04455087-221A-4F49-AC81-F0FC1F46ABA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicImageHandler.Web.Demo", "DynamicImageHandler.Web.Demo\DynamicImageHandler.Web.Demo.csproj", "{89A690F5-40CF-4D29-B7FD-B7759CDDD143}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{5F6ECA50-38F4-40D9-B27B-D8ABFDA6DDF3}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
 		Dynamic.Image.Handler.nuspec = Dynamic.Image.Handler.nuspec
 		DynamicImageHandler.sln.DotSettings = DynamicImageHandler.sln.DotSettings
 		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "DynamicImageHandler.Web.Demo(1)", "DynamicImageHandler.Web.Demo\", "{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
+		ProjectReferences = "{eb46873f-dfb7-48ec-97ee-1a3bdf628b5b}|DynamicImageHandler.dll;{144e0629-e10b-4189-a490-502f160fea84}|DynamicImageHandler.ImageTool.FreeImage.dll;{04455087-221a-4f49-ac81-f0fc1f46aba0}|DynamicImageHandler.ImageTool.Wpf.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_59218"
+		Debug.AspNetCompiler.PhysicalPath = "DynamicImageHandler.Web.Demo\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_59218\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_59218"
+		Release.AspNetCompiler.PhysicalPath = "DynamicImageHandler.Web.Demo\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_59218\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "59218"
+		SlnRelativePath = "DynamicImageHandler.Web.Demo\"
+		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject
 Global
@@ -49,13 +70,14 @@ Global
 		{04455087-221A-4F49-AC81-F0FC1F46ABA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04455087-221A-4F49-AC81-F0FC1F46ABA0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{04455087-221A-4F49-AC81-F0FC1F46ABA0}.Release|x86.ActiveCfg = Release|Any CPU
-		{89A690F5-40CF-4D29-B7FD-B7759CDDD143}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{89A690F5-40CF-4D29-B7FD-B7759CDDD143}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{89A690F5-40CF-4D29-B7FD-B7759CDDD143}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{89A690F5-40CF-4D29-B7FD-B7759CDDD143}.Debug|x86.Build.0 = Debug|Any CPU
-		{89A690F5-40CF-4D29-B7FD-B7759CDDD143}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{89A690F5-40CF-4D29-B7FD-B7759CDDD143}.Release|Any CPU.Build.0 = Release|Any CPU
-		{89A690F5-40CF-4D29-B7FD-B7759CDDD143}.Release|x86.ActiveCfg = Release|Any CPU
+		{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}.Debug|x86.Build.0 = Debug|Any CPU
+		{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}.Release|x86.ActiveCfg = Debug|Any CPU
+		{C5ED05F4-C6A1-4CC3-B320-96DEF8F6A87C}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
