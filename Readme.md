@@ -9,7 +9,7 @@ Additional features added: watermark and resizing improvements.
 
 GPLv2 licensed
 
-# Need a professional solution? Use a real image resizer.
+## Have a real site? Use a professional image resizer.
 
-If you have a real site and need a real professional image resizing solution, you should use something like [ImageResizer.NET](http://imageresizing.net/).
+An excellent professional image resizing solution is [ImageResizer.NET](http://imageresizing.net/).
 
