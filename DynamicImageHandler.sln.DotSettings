@@ -1,7 +1,7 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">// --------------------------------------------------------------------------------------------------------------------&#xD;
 // Copyright (c) 2009-2010 Esben Carlsen&#xD;
-// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems&#xD;
+// Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems&#xD;
 // &#xD;
 // This library is free software; you can redistribute it and/or&#xD;
 // modify it under the terms of the GNU Lesser General Public&#xD;

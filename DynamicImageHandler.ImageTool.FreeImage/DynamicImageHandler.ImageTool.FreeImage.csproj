@@ -66,11 +66,4 @@
   <ItemGroup>
     <PackageReference Include="VVVV.FreeImage" Version="3.15.1.1" />
   </ItemGroup>
-  <Import Project="..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets" Condition="Exists('..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets'))" />
-  </Target>
 </Project>
