@@ -40,11 +40,11 @@ namespace DynamicImageHandler
     /// </summary>
     public class ImageHandler : IHttpHandler
     {
-        private static readonly IImageStore _imageStore = Factory.GetImageStore();
+        private static readonly IImageStore _imageStore = Factory.ImageStore;
 
-        private static readonly IImageTool _imageTool = Factory.GetImageTool();
+        private static readonly IImageTool _imageTool = Factory.ImageTool;
 
-        private readonly List<IImageFilter> _imageFilters = Factory.GetImageFilters().ToList();
+        private readonly List<IImageFilter> _imageFilters = Factory.ImageFilters.ToList();
 
         /// <summary>
         ///     Gets ImageFilters.
@@ -78,7 +78,7 @@ namespace DynamicImageHandler
         /// </exception>
         public void ProcessRequest(HttpContext context)
         {
-            IImageParameters parameters = Factory.GetImageParameters();
+            IImageParameters parameters = Factory.ImageParameter;
 
             if (parameters == null)
             {
@@ -95,7 +95,7 @@ namespace DynamicImageHandler
             }
 
             // add file updated parameter if available...
-            Factory.GetImageProvider().AddImageLastUpdatedParameter(parameters);
+            Factory.ImageProvider.AddImageLastUpdatedParameter(parameters);
 
             string key = parameters.Key;
 
@@ -195,8 +195,6 @@ namespace DynamicImageHandler
             return true;
         }
 
-        
-
         /// <summary>
         ///     Takes care of resizing image from url parameters
         /// </summary>
@@ -211,7 +209,7 @@ namespace DynamicImageHandler
         /// </returns>
         private byte[] GetImageData(IImageParameters parameters, HttpContext context, ImageFormat imageFormat)
         {
-            IImageProvider provider = Factory.GetImageProvider();
+            IImageProvider provider = Factory.ImageProvider;
             if (provider == null)
             {
                 throw new ApplicationException("Unable to determine image provider");

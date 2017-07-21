@@ -1,27 +1,30 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// Copyright (c) 2009-2010 Esben Carlsen
-// Forked Copyright (c) 2011-2015 Jaben Cargman and CaptiveAire Systems
-//	
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
-// --------------------------------------------------------------------------------------------------------------------
+﻿// // --------------------------------------------------------------------------------------------------------------------
+// // Copyright (c) 2009-2010 Esben Carlsen
+// // Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems
+// // 
+// // This library is free software; you can redistribute it and/or
+// // modify it under the terms of the GNU Lesser General Public
+// // License as published by the Free Software Foundation; either
+// // version 2.1 of the License, or (at your option) any later version.
+// 
+// // This library is distributed in the hope that it will be useful,
+// // but WITHOUT ANY WARRANTY; without even the implied warranty of
+// // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// // Lesser General Public License for more details.
+// 
+// // You should have received a copy of the GNU Lesser General Public
+// // License along with this library; if not, write to the Free Software
+// // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
+// // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 
 using DynamicImageHandler.Filters;
 using DynamicImageHandler.ImageParameters;
@@ -34,110 +37,91 @@ namespace DynamicImageHandler
 {
     public class Factory
     {
-        private static readonly object _syncLock = new object();
-
-        private static volatile IImageProvider _imageProvider;
-
-        private static volatile IImageStore _imageStore;
-
-        private static volatile IImageTool _imageTool;
-
-        private static volatile IImageFilter[] _imageFilters;
-
-        private static volatile Func<IImageParameters> _createParameters;
-
-        /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-        public static IImageParameters GetImageParameters()
+        static Factory()
         {
-            if (_createParameters == null)
-            {
-                lock (_syncLock)
-                {
-                    if (_createParameters == null)
-                    {
-                        _createParameters = () => ActivateType<IImageParameters>(Settings.Default.ImageParametersType);
-                    }
-                }
-            }
+            _imageProvider = new Lazy<IImageProvider>(
+                () => ActivateTypeFromString<IImageProvider>(Settings.Default.ImageProviderType),
+                LazyThreadSafetyMode.ExecutionAndPublication);
 
-            return _createParameters();
+            _imageStore = new Lazy<IImageStore>(
+                () => ActivateTypeFromString<IImageStore>(Settings.Default.ImageStoreType),
+                LazyThreadSafetyMode.ExecutionAndPublication);
+
+            _imageTool = new Lazy<IImageTool>(
+                () => ActivateTypeFromString<IImageTool>(Settings.Default.ImageToolType),
+                LazyThreadSafetyMode.ExecutionAndPublication);
+
+            _imageFilters = new Lazy<IImageFilter[]>(() => LoadImageFilters(), LazyThreadSafetyMode.ExecutionAndPublication);
+
+            _createParameters = () => ActivateTypeFromString<IImageParameters>(Settings.Default.ImageParametersType);
         }
 
-        public static IImageProvider GetImageProvider()
-        {
-            if (_imageProvider != null)
-            {
-                return _imageProvider;
-            }
+        static readonly Lazy<IImageProvider> _imageProvider;
 
-            lock (_syncLock)
-            {
-                return _imageProvider ?? (_imageProvider = ActivateType<IImageProvider>(Settings.Default.ImageProviderType));
-            }
-        }
+        static readonly Lazy<IImageStore> _imageStore;
 
-        public static IImageStore GetImageStore()
-        {
-            if (_imageStore != null)
-            {
-                return _imageStore;
-            }
+        static readonly Lazy<IImageTool> _imageTool;
 
-            lock (_syncLock)
-            {
-                return _imageStore ?? (_imageStore = ActivateType<IImageStore>(Settings.Default.ImageStoreType));
-            }
-        }
+        static readonly Lazy<IImageFilter[]> _imageFilters;
 
-        private static T ActivateType<T>(string type) where T : class
+        static readonly Func<IImageParameters> _createParameters;
+
+        static readonly ConcurrentDictionary<Type, Func<object>> _activatorLookup = new ConcurrentDictionary<Type, Func<object>>();
+
+        static T ActivateTypeFromString<T>(string type)
+            where T : class
         {
             Type activateType = Type.GetType(type);
 
             if (activateType == null)
             {
-                throw new ConfigurationErrorsException(string.Format("Unable to resolve image store type: {0}", type));
+                throw new ConfigurationErrorsException($"Unable to resolve image store type: {type}");
             }
 
-            return Activator.CreateInstance(activateType) as T;
+            return ActivateType<T>(activateType);
         }
 
-        public static IEnumerable<IImageFilter> GetImageFilters()
+        static T ActivateType<T>(Type activateType)
         {
-            if (_imageFilters == null)
-            {
-                lock (_syncLock)
-                {
-                    if (_imageFilters == null)
+            var newCtor = _activatorLookup.GetOrAdd(
+                activateType,
+                t =>
                     {
-                        var imageFilterTypes =
-                            Assembly.GetExecutingAssembly()
-                                .GetTypes()
-                                .Where(
-                                    s =>
-                                    s.Namespace != null && !s.IsAbstract && s.IsClass
-                                    && s.GetInterfaces().Any(i => i == typeof(IImageFilter)))
-                                .Distinct()
-                                .ToList();
+                        ConstructorInfo constructor = t.GetConstructor(
+                            BindingFlags.Instance | BindingFlags.Public,
+                            null,
+                            new Type[0],
+                            null);
 
-                        _imageFilters = imageFilterTypes.Select(i => Activator.CreateInstance(i) as IImageFilter).ToArray();
-                    }
-                }
-            }
+                        Expression<Func<object>> ctor =
+                            Expression.Lambda<Func<object>>(Expression.Convert(Expression.New(constructor), typeof(object)));
 
-            return _imageFilters;
+                        return ctor.Compile();
+                    });
+
+            return (T)newCtor();
         }
 
-        public static IImageTool GetImageTool()
+        static IImageFilter[] LoadImageFilters()
         {
-            if (_imageTool != null)
-            {
-                return _imageTool;
-            }
+            var imageFilterTypes = Assembly.GetExecutingAssembly().GetTypes().Where(
+                    s => s.Namespace != null && !s.IsAbstract && s.IsClass && s.GetInterfaces().Any(i => i == typeof(IImageFilter)))
+                .Distinct()
+                .ToList();
 
-            lock (_syncLock)
-            {
-                return _imageTool ?? (_imageTool = ActivateType<IImageTool>(Settings.Default.ImageToolType));
-            }
+            return imageFilterTypes.Select(filterType => ActivateType<IImageFilter>(filterType)).ToArray();
         }
+
+        /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+
+        #region Public Properties
+        
+        public static IImageParameters ImageParameter => _createParameters();
+        public static IImageProvider ImageProvider => _imageProvider.Value;
+        public static IImageStore ImageStore => _imageStore.Value;
+        public static IImageTool ImageTool => _imageTool.Value;
+        public static IEnumerable<IImageFilter> ImageFilters => _imageFilters.Value;
+
+        #endregion
     }
 }

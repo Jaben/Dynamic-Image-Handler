@@ -32,7 +32,7 @@ namespace DynamicImageHandler.Filters
         {
             get
             {
-                return Factory.GetImageTool();
+                return Factory.ImageTool;
             }
         }
 
