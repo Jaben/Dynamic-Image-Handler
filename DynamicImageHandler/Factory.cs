@@ -41,24 +41,24 @@ namespace DynamicImageHandler
         static Factory()
         {
             _imageProvider = new Lazy<IImageProvider>(
-                () => ActivateTypeFromString<IImageProvider>(Settings.Default.ImageProviderType),
+                () => ActivateTypeFromString<IImageProvider>(Settings.Default.ImageProviderType, "Image Provider"),
                 LazyThreadSafetyMode.ExecutionAndPublication);
 
             _imageStore = new Lazy<IImageStore>(
-                () => ActivateTypeFromString<IImageStore>(Settings.Default.ImageStoreType),
+                () => ActivateTypeFromString<IImageStore>(Settings.Default.ImageStoreType, "Image Store"),
                 LazyThreadSafetyMode.ExecutionAndPublication);
 
             _imageTool = new Lazy<IImageTool>(
-                () => ActivateTypeFromString<IImageTool>(Settings.Default.ImageToolType),
+                () => ActivateTypeFromString<IImageTool>(Settings.Default.ImageToolType, "Image Tool"),
                 LazyThreadSafetyMode.ExecutionAndPublication);
 
             _imageProcessor = new Lazy<IImageProcessor>(
-                () => ActivateTypeFromString<IImageProcessor>(Settings.Default.ImageProcessorType),
+                () => ActivateTypeFromString<IImageProcessor>(Settings.Default.ImageProcessorType, "Image Processor"),
                 LazyThreadSafetyMode.ExecutionAndPublication);
 
             _imageFilters = new Lazy<IImageFilter[]>(() => LoadImageFilters(), LazyThreadSafetyMode.ExecutionAndPublication);
 
-            _createParameters = () => ActivateTypeFromString<IImageParameters>(Settings.Default.ImageParametersType);
+            _createParameters = () => ActivateTypeFromString<IImageParameters>(Settings.Default.ImageParametersType, "Image Parameters");
         }
 
         static readonly Lazy<IImageProvider> _imageProvider;
@@ -75,14 +75,14 @@ namespace DynamicImageHandler
 
         static readonly ConcurrentDictionary<Type, Func<object>> _activatorLookup = new ConcurrentDictionary<Type, Func<object>>();
 
-        static T ActivateTypeFromString<T>(string type)
+        static T ActivateTypeFromString<T>(string type, string name)
             where T : class
         {
             Type activateType = Type.GetType(type);
 
             if (activateType == null)
             {
-                throw new ConfigurationErrorsException($"Unable to resolve image store type: {type}");
+                throw new ConfigurationErrorsException($"Unable to resolve {name} type: {type}");
             }
 
             return ActivateType<T>(activateType);
