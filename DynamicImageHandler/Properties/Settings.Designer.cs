@@ -88,7 +88,7 @@ namespace DynamicImageHandler.Properties {
 
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DynamicImageHandler.ImageProcessor.ImageProcessor, DynamicImageHandler<")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DynamicImageHandler.ImageProcessors.ImageProcessor, DynamicImageHandler")]
         public string ImageProcessorType
         {
             get
