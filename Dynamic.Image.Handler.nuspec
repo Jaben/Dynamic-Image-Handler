@@ -11,7 +11,7 @@
         <language>en-US</language>
         <tags>image server handler resizing</tags>
         <dependencies>
-            <dependency id="FreeImage-dotnet-core" version="4.0.3" />
+            <dependency id="FreeImage-dotnet-core" version="4.3.6" />
         </dependencies>
     </metadata>
     <files>
