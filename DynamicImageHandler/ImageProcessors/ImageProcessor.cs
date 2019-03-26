@@ -99,7 +99,10 @@ namespace DynamicImageHandler.ImageProcessors
 
             try
             {
-                using (var sourceImageData = new MemoryStream(data)) outputImg = (Bitmap)Image.FromStream(sourceImageData);
+                using (var sourceImageData = new MemoryStream(data))
+                {
+                    outputImg = (Bitmap)Image.FromStream(sourceImageData);
+                }
 
                 foreach (var imageFilter in this._imageFilters)
                 {
