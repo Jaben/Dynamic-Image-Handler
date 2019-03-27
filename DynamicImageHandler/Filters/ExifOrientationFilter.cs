@@ -25,7 +25,7 @@ using DynamicImageHandler.ImageParameters;
 
 namespace DynamicImageHandler.Filters
 {
-    internal class ExifOrientationFilter : IImageFilter
+    internal class ExifOrientationFilter : IImagePrefilter
     {
         public enum ExifOrientations
         {
@@ -41,25 +41,21 @@ namespace DynamicImageHandler.Filters
         }
 
         const int OrientationId = 0x112; //274
-        public int Order => 1;
 
-        public bool Process(IImageParameters parameters, ref Bitmap bitmap)
+        public void Process(Bitmap bitmap)
         {
             var orientation = GetExifOrientation(bitmap);
 
             if (orientation == ExifOrientations.TopLeft || orientation == ExifOrientations.Unknown)
             {
                 // nothing to do...
-                return false;
+                return;
             }
 
             OrientImage(bitmap, orientation);
 
             // Set the image's orientation to TopLeft.
             SetImageOrientation(bitmap, ExifOrientations.TopLeft);
-
-            // we've modified the image
-            return true;
         }
 
         // Set the image's orientation.

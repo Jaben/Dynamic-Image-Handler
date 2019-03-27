@@ -50,8 +50,7 @@ namespace DynamicImageHandler.ImageParameters
 
             if (!string.IsNullOrWhiteSpace(format))
             {
-                ImageFormat imageFormat;
-                if (ImageFormatLookup.TryGetValue(format, out imageFormat))
+                if (ImageFormatLookup.TryGetValue(format, out var imageFormat))
                 {
                     return imageFormat;
                 }
@@ -68,8 +67,7 @@ namespace DynamicImageHandler.ImageParameters
                 throw new ArgumentNullException("imageParameters");
             }
 
-            string value;
-            imageParameters.Parameters.TryGetValue(name, out value);
+            imageParameters.Parameters.TryGetValue(name, out string value);
 
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -113,8 +111,7 @@ namespace DynamicImageHandler.ImageParameters
 
             foreach (var map in mappings)
             {
-                string stringValue;
-                if (parameters.Parameters.TryGetValue(map.Key, out stringValue) && !string.IsNullOrWhiteSpace(stringValue))
+                if (parameters.Parameters.TryGetValue(map.Key, out string stringValue) && !string.IsNullOrWhiteSpace(stringValue))
                 {
                     map.Value(mappedParamObj, stringValue);
                 }
@@ -163,8 +160,7 @@ namespace DynamicImageHandler.ImageParameters
             if (conversionType == typeof(bool))
             {
                 // special handling for bool
-                bool bv;
-                if (bool.TryParse(stringValue, out bv))
+                if (bool.TryParse(stringValue, out bool bv))
                 {
                     return bv;
                 }
@@ -181,8 +177,7 @@ namespace DynamicImageHandler.ImageParameters
             }
             else if (conversionType == typeof(float))
             {
-                float f;
-                if (float.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
+                if (float.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out float f))
                 {
                     return f;
                 }

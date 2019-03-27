@@ -19,6 +19,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Web.Hosting;
 
 using DynamicImageHandler.ImageParameters;
@@ -42,9 +43,24 @@ namespace DynamicImageHandler.ImageProviders
                 return parameters.GetImageSrc();
             }
 
-            string filePath = HostingEnvironment.MapPath(parameters.GetImageSrc());
+            foreach (var filePath in new[] { parameters.GetImageSrc(), "~" + parameters.GetImageSrc() }.Distinct())
+            {
+                try
+                {
+                    var fp = HostingEnvironment.MapPath(filePath);
 
-            return FileSystemHelpers.FileExists(filePath) ? filePath : null;
+                    if (FileSystemHelpers.FileExists(fp))
+                    {
+                        return fp;
+                    }
+                }
+                catch
+                {
+                    // ignore
+                }
+            }
+
+            return null;
         }
 
         public void AddImageLastUpdatedParameter(IImageParameters parameters)
@@ -68,7 +84,12 @@ namespace DynamicImageHandler.ImageProviders
         {
             string fileName = this.GetMappedFileFromParams(parameters);
 
-            return string.IsNullOrEmpty(fileName) ? null : File.ReadAllBytes(fileName);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentNullException(nameof(fileName), $"Mapped '{fileName}' doesn't exist for image source '{parameters.GetImageSrc()}'");
+            }
+
+            return File.ReadAllBytes(fileName);
         }
     }
 }

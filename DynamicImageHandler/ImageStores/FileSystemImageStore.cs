@@ -95,6 +95,7 @@ namespace DynamicImageHandler.ImageStores
         {
             // Don't check file age here, to slow, let the scavanger handle that
             string fileName = this.GetFileName(key);
+
             return !FileSystemHelpers.FileExists(fileName) ? null : File.ReadAllBytes(fileName);
         }
 

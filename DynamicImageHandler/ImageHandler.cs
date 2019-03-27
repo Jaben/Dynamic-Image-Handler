@@ -82,15 +82,23 @@ namespace DynamicImageHandler
                 return;
             }
 
-            var imageData = this.ImageProcessor.GetProcessedImage(parameters);
+            try
+            {
+                var imageData = this.ImageProcessor.GetProcessedImage(parameters);
 
-            var httpResponse = context.Response;
+                var httpResponse = context.Response;
 
-            httpResponse.Cache.SetCacheability(HttpCacheability.Public);
-            httpResponse.Cache.SetETag(eTag);
-            httpResponse.Cache.SetExpires(DateTime.Now.AddYears(1));
-            httpResponse.ContentType = $"image/{parameters.GetImageFormat().ToString().ToLower()}";
-            httpResponse.OutputStream.Write(imageData, 0, imageData.Length);
+                httpResponse.Cache.SetCacheability(HttpCacheability.Public);
+                httpResponse.Cache.SetETag(eTag);
+                httpResponse.Cache.SetExpires(DateTime.Now.AddYears(1));
+                httpResponse.ContentType = $"image/{parameters.GetImageFormat().ToString().ToLower()}";
+                httpResponse.OutputStream.Write(imageData, 0, imageData.Length);
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusCode = 500;
+                context.Response.Output.WriteLine($"Failure Processing Image: {ex}");
+            }
         }
 
         /// <summary>

@@ -1,3 +1,22 @@
+// // --------------------------------------------------------------------------------------------------------------------
+// // Copyright (c) 2009-2010 Esben Carlsen
+// // Forked Copyright (c) 2011-2017 Jaben Cargman and CaptiveAire Systems
+// // 
+// // This library is free software; you can redistribute it and/or
+// // modify it under the terms of the GNU Lesser General Public
+// // License as published by the Free Software Foundation; either
+// // version 2.1 of the License, or (at your option) any later version.
+// 
+// // This library is distributed in the hope that it will be useful,
+// // but WITHOUT ANY WARRANTY; without even the implied warranty of
+// // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// // Lesser General Public License for more details.
+// 
+// // You should have received a copy of the GNU Lesser General Public
+// // License along with this library; if not, write to the Free Software
+// // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA 
+// // --------------------------------------------------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,15 +35,17 @@ namespace DynamicImageHandler.ImageProcessors
     public class ImageProcessor : IImageProcessor
     {
         readonly List<IImageFilter> _imageFilters;
-        readonly IImageProvider _provider;
-        readonly IImageTool _imageTool;
+        readonly List<IImagePrefilter> _imagePrefilters;
         readonly IImageStore _imageStore;
+        readonly IImageTool _imageTool;
+
+        readonly IImageProvider _provider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageProcessor"/> class.
         /// </summary>
         public ImageProcessor()
-            : this(Factory.ImageProvider, Factory.ImageTool, Factory.ImageStore, Factory.ImageFilters)
+            : this(Factory.ImageProvider, Factory.ImageTool, Factory.ImageStore, Factory.ImageFilters, Factory.ImagePrefilters)
         {
         }
 
@@ -42,11 +63,18 @@ namespace DynamicImageHandler.ImageProcessors
         /// or
         /// imageStore
         /// </exception>
-        public ImageProcessor(IImageProvider provider, IImageTool imageTool, IImageStore imageStore, IEnumerable<IImageFilter> imageFilters)
+        public ImageProcessor(
+            IImageProvider provider,
+            IImageTool imageTool,
+            IImageStore imageStore,
+            IEnumerable<IImageFilter> imageFilters,
+            IEnumerable<IImagePrefilter> imagePrefilters)
         {
             this._provider = provider ?? throw new ArgumentNullException(nameof(provider));
             this._imageTool = imageTool ?? throw new ArgumentNullException(nameof(imageTool));
             this._imageStore = imageStore ?? throw new ArgumentNullException(nameof(imageStore));
+
+            this._imagePrefilters = imagePrefilters.IfNullEmpty().ToList();
             this._imageFilters = imageFilters.IfNullEmpty().OrderBy(s => s.Order).ToList();
         }
 
@@ -68,11 +96,12 @@ namespace DynamicImageHandler.ImageProcessors
 
             if (imageData == null)
             {
-                // no cached image avaliable -- go ahead and process
+                // no cached image available -- go ahead and process
                 imageData = this.ProcessImageFromParameters(parameters);
+
                 if (imageData == null)
                 {
-                    return null;
+                    throw new ArgumentNullException("Processed Image is Null");
                 }
 
                 // persist the image
@@ -90,9 +119,10 @@ namespace DynamicImageHandler.ImageProcessors
         byte[] ProcessImageFromParameters(IImageParameters parameters)
         {
             var data = this._provider.GetImageData(parameters);
+
             if (data == null)
             {
-                return null;
+                throw new ArgumentNullException($"Image data returned null for ImageSrc: '{parameters.GetImageSrc()}'");
             }
 
             Bitmap outputImg = null;
@@ -102,6 +132,11 @@ namespace DynamicImageHandler.ImageProcessors
                 using (var sourceImageData = new MemoryStream(data))
                 {
                     outputImg = (Bitmap)Image.FromStream(sourceImageData);
+
+                    foreach (var prefilter in this._imagePrefilters)
+                    {
+                        prefilter.Process(outputImg);
+                    }
                 }
 
                 foreach (var imageFilter in this._imageFilters)

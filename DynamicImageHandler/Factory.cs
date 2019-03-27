@@ -58,6 +58,8 @@ namespace DynamicImageHandler
 
             _imageFilters = new Lazy<IImageFilter[]>(() => LoadImageFilters(), LazyThreadSafetyMode.ExecutionAndPublication);
 
+            _imagePrefilters = new Lazy<IImagePrefilter[]>(() => LoadImagePrefilters(), LazyThreadSafetyMode.ExecutionAndPublication);
+
             _createParameters = () => ActivateTypeFromString<IImageParameters>(Settings.Default.ImageParametersType, "Image Parameters");
         }
 
@@ -69,11 +71,24 @@ namespace DynamicImageHandler
 
         static readonly Lazy<IImageFilter[]> _imageFilters;
 
+        static readonly Lazy<IImagePrefilter[]> _imagePrefilters;
+
         static readonly Lazy<IImageProcessor> _imageProcessor;
 
         static readonly Func<IImageParameters> _createParameters;
 
         static readonly ConcurrentDictionary<Type, Func<object>> _activatorLookup = new ConcurrentDictionary<Type, Func<object>>();
+
+        static IImagePrefilter[] LoadImagePrefilters()
+        {
+            var imageFilterTypes = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(s => s.Namespace != null && !s.IsAbstract && s.IsClass && s.GetInterfaces().Any(i => i == typeof(IImagePrefilter)))
+                .Distinct()
+                .ToList();
+
+            return imageFilterTypes.Select(filterType => ActivateType<IImagePrefilter>(filterType)).ToArray();
+        }
 
         static T ActivateTypeFromString<T>(string type, string name)
             where T : class
@@ -111,8 +126,9 @@ namespace DynamicImageHandler
 
         static IImageFilter[] LoadImageFilters()
         {
-            var imageFilterTypes = Assembly.GetExecutingAssembly().GetTypes().Where(
-                    s => s.Namespace != null && !s.IsAbstract && s.IsClass && s.GetInterfaces().Any(i => i == typeof(IImageFilter)))
+            var imageFilterTypes = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(s => s.Namespace != null && !s.IsAbstract && s.IsClass && s.GetInterfaces().Any(i => i == typeof(IImageFilter)))
                 .Distinct()
                 .ToList();
 
@@ -122,12 +138,14 @@ namespace DynamicImageHandler
         /// <exception cref="Exception">A delegate callback throws an exception.</exception>
 
         #region Public Properties
-        
+
         public static IImageParameters GetImageParameter => _createParameters();
+
         public static IImageProvider ImageProvider => _imageProvider.Value;
         public static IImageStore ImageStore => _imageStore.Value;
         public static IImageTool ImageTool => _imageTool.Value;
         public static IEnumerable<IImageFilter> ImageFilters => _imageFilters.Value;
+        public static IEnumerable<IImagePrefilter> ImagePrefilters => _imagePrefilters.Value;
         public static IImageProcessor ImageProcessor => _imageProcessor.Value;
 
         #endregion
